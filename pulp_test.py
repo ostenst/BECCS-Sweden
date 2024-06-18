@@ -1,4 +1,9 @@
 from functions import *
+## The idea for heat pumps is this:
+# Tharun suggests a temperature lift of +60C is possible with HPs. I have his reboiler with its pressure and temp. https://www.sciencedirect.com/science/article/pii/S030626192300291X?via%3Dihub
+# Electrification of amine is possible using HPs. If waste heat is around 60-70C and we have same pressure^. https://www.sciencedirect.com/science/article/pii/S2772656823000581?via%3Dihub#bib0028
+# There is waste heat in Pulp plants at above 60C, which Elin found through regression. https://research.chalmers.se/publication/508644 
+# Combining these, we can make the argument that pulp plants can recover heat around 60C for either a reboiler or a DH network! Using HPs.
 
 # # This is my intended usage:
 # PP.estimate_rankine() # But maybe here, we need to tell how much CHP is already produced?
