@@ -6,7 +6,7 @@ from functions import *
 # Combining these, we can make the argument that pulp plants can recover heat around 60C for either a reboiler or a DH network! Using HPs.
 
 # Useful heat avialbe for steam production from black liquor combustion = 6.046 MWh/air-dried tonne of pulp (Svensson, 2018)
-
+# CEPCI source from JUdits MEX thesis: https://toweringskills.com/financial-analysis/cost-indices/
 
 ### THE CALCULATIONS THAT WILL BE PERFORMED FOR ONE PULP (AND PAPER) PLANT ###
 # I need to have this fixed data for each plant:
