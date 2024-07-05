@@ -1,4 +1,13 @@
 from functions import *
+# Some useful sources:
+# https://www.degruyter.com/document/doi/10.3183/npprj-2014-29-04-p620-634/html
+# https://eippcb.jrc.ec.europa.eu/sites/default/files/2019-11/PP_revised_BREF_2015.pdf
+# https://www.sciencedirect.com/science/article/pii/S1750583616307435?casa_token=vKEGKAa7G1EAAAAA:AGtpxMioXOkgf4NcVuJF98FIOioMPCr2hWB-mo3R8lcwK94r5wtZIffW6w0l1TI4soh-gpAaLw#bib0075
+# https://odr.chalmers.se/items/be04dbdc-ede1-41fb-a96c-e0e7cdcd6862
+# https://www.sciencedirect.com/science/article/pii/S1750583622001074
+# https://www.mdpi.com/1996-1073/14/24/8499
+
+
 ## The idea for heat pumps is this:
 # Tharun suggests a temperature lift of +60C is possible with HPs. I have his reboiler with its pressure and temp. https://www.sciencedirect.com/science/article/pii/S030626192300291X?via%3Dihub
 # Electrification of amine is possible using HPs. If waste heat is around 60-70C and we have same pressure^. https://www.sciencedirect.com/science/article/pii/S2772656823000581?via%3Dihub#bib0028
