@@ -24,6 +24,8 @@ from functions import *
 #       - Calculate nominal Pel and Qdh (if DH exists)
 #       - Calculate an "extra emissions" factor: CO2/MWh_steam_bark (Some of this MWh (in the form of steam) may be used for the Qreb. If it is, allocate these emissions to CCS)
 # (4) Calculate Vfluegas and mCO2 totals
+        # STARTING FROM HERE; THIS IS WHERE THE RDM EVALUATIONS; I.E: the UNCERTAINTIES AND LEVERS, COME INTO PLAY AND ARE INTERESTING:
+        # NOTE: this means that we assume the AVAILABLE STEAM is known and constant across cases... is this ok? I think we will say that it is :) we do for CHP anyway the same!
 # (5) Apply regression: Qreb, Wcc, QTcurves = f(Vfluegases,%CO2,CaptureRate)
 # (OLD 6) Determine available heat from:
 #       - Process: Q60 = f(tPulp/yr, tPaper/yr, regression) and Qmax,process = Q60 at the cost of COP=2.5 ish
