@@ -98,7 +98,7 @@ class PulpPlant:
     
     def burn_fuel(self, technology_assumptions):
 
-        b = technology_assumptions["bark_increase"] #We need to update energy balances but save the old emissions!
+        b = technology_assumptions["bark_increase"]
        
         recovery_emissions = self.energybalance["recovery_capacity"] * technology_assumptions["factor_recovery"] /1000         
         bark_emissions = self.energybalance["bark_capacity"] * technology_assumptions["factor_bark"] /1000  
@@ -130,6 +130,26 @@ class PulpPlant:
         self.energybalance["Q_reboiler"] = Q_reboiler
         self.energybalance["W_captureplant"] = W_captureplant
 
+    def feed_then_condense(self):
+        
+        # Re-calculate all capacities, after available steam has been reduced by Q_reboiler
+        recovery_capacity = self.energybalance["recovery_capacity"]
+        bark_capacity = self.energybalance["bark_capacity"]
+        available_steam = self.energybalance["available_steam"] - self.energybalance["Q_reboiler"]
+
+        time = self.energybalance_assumptions["time"]
+        m_recovery = available_steam*1000 * (recovery_capacity/(recovery_capacity+bark_capacity)) /time /(self.states["live_recovery"].h-self.states["boiler"].h) #[kg/s]
+        m_bark     = available_steam*1000 * (bark_capacity    /(recovery_capacity+bark_capacity)) /time /(self.states["live_bark"].h-self.states["boiler"].h)     
+        P_recovery = m_recovery * (self.states["live_recovery"].h - self.states["mix_recovery"].h)
+        P_bark     = m_bark * (self.states["live_bark"].h - self.states["mix_bark"].h) 
+
+        dP_recovery = self.energybalance["P_recovery"] - P_recovery
+        dP_bark = self.energybalance["P_bark"] - P_bark
+
+        P_lost = dP_recovery + dP_bark + self.energybalance["W_captureplant"]
+        print("Plost is too large? Somethings is wrong...=", P_lost)
+        self.energybalance["P_lost"] = P_lost
+
     def __repr__(self):
         return (f"PulpPlant(Name={self.name}, Pulp Capacity={self.pulp_capacity}, Bark Capacity={self.bark_share}, "
                 f"Recovery Boiler={self.recovery_boiler}, Bark Boiler={self.bark_boiler}, Heat Demand={self.heat_demand}, "
@@ -150,7 +170,7 @@ def CCS_Pulp(
     factor_bark = 0.322285714,
     fluegas_intensity = 10188.75,   #[kg/t]
     rate = 0.90,
-    SupplyStrategy = "Steam",
+    SupplyStrategy = "SteamHP",
     pulp_interpolation=None,
     PulpPlant=None
 ):
@@ -170,14 +190,16 @@ def CCS_Pulp(
     PulpPlant.burn_fuel(technology_assumptions)
 
     PulpPlant.size_MEA(rate, pulp_interpolation)
+    print(PulpPlant.energybalance)
 
-    # if SupplyStrategy == "SteamHP":
-    #     PulpPlant.feed_and_condense()
+    if SupplyStrategy == "SteamHP":
+        PulpPlant.feed_then_condense()
 
-    # elif SupplyStrategy == "SteamLP":
-    #     PulpPlant.
+    elif SupplyStrategy == "SteamLP":
+        PulpPlant.expand_then_feed()
 
-
+    elif SupplyStrategy == "HeatPumps":
+        PulpPlant.recover_and_supplement()
 
 
     capture_cost, penalty_services, penalty_biomass = [1,2,3]
