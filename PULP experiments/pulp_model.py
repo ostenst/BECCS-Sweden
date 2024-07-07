@@ -30,10 +30,10 @@ class State:
             raise ValueError("Steam properties cannot be determined")
 
 class PulpPlant:
-    def __init__(self, name, pulp_capacity, bark_capacity, recovery_boiler, bark_boiler, heat_demand, electricity_demand, rp, rt, bp, bt, lp, energybalance_assumptions=None):
+    def __init__(self, name, pulp_capacity, bark_share, recovery_boiler, bark_boiler, heat_demand, electricity_demand, rp, rt, bp, bt, lp, energybalance_assumptions=None):
         self.name = name
         self.pulp_capacity = pulp_capacity
-        self.bark_capacity = bark_capacity
+        self.bark_share = bark_share
         self.recovery_boiler = recovery_boiler
         self.bark_boiler = bark_boiler
         self.heat_demand = heat_demand
@@ -50,13 +50,13 @@ class PulpPlant:
 
         self.states = None
         self.energybalance = None
-        print(" ... initiating plant")
+        self.gases = None
     
     def estimate_nominal_cycle(self):
 
         # Calculating available steam
         recovery_capacity = self.energybalance_assumptions["recovery_intensity"] /3.6 * self.pulp_capacity  #[MWh/yr]
-        bark_capacity = recovery_capacity * self.bark_capacity
+        bark_capacity = recovery_capacity * self.bark_share
         heat_demand = self.energybalance_assumptions["heat_intensity"] /3.6 * self.pulp_capacity          
         available_steam = (recovery_capacity + bark_capacity) - heat_demand
         electricity_demand = self.energybalance_assumptions["electricity_intensity"] * self.pulp_capacity
@@ -66,6 +66,10 @@ class PulpPlant:
         boiler          = State("boiler", p=cp, satL=True)
         live_recovery   = State("recovery", p=self.rp, T=self.rt)
         mix_recovery    = State("-", p=cp, s=live_recovery.s, mix=True)
+        if self.bp == 0:
+            print("No bark boiler found, verify its capacity is zero")
+            self.bp = 100
+            self.bt = 500
         live_bark       = State("bark", p=self.bp, T=self.bt)
         mix_bark        = State("-", p=cp, s=live_bark.s, mix=True)
         self.states = {
@@ -82,19 +86,52 @@ class PulpPlant:
         P_recovery = m_recovery * (live_recovery.h - mix_recovery.h) /1000 #[MW]
         P_bark     = m_bark * (live_bark.h - mix_bark.h) /1000 
         self.energybalance = {
-            "available_steam": available_steam, #[MWh/yr] NOTE: if needed later, you can save other capacities in this dict! And don't calculate biomass GWh here, do it later within RDM analysis.
-            "m_recovery":   m_recovery,         #[MW]
-            "m_bark":       m_bark,             #[MW]
-            "P_recovery":   P_recovery*time,    #[MWh/yr]   
-            "P_bark":       P_bark*time,        #[MWh/yr]
-            "P_demand":     electricity_demand  #[MWh/yr]
+            "recovery_capacity": recovery_capacity, #[MWh/yr]
+            "bark_capacity": bark_capacity,         #[MWh/yr]
+            "available_steam": available_steam,     #[MWh/yr] NOTE: if needed later, you can save other capacities in this dict! And don't calculate biomass GWh here, do it later within RDM analysis.
+            "m_recovery":   m_recovery,             #[kg/s]
+            "m_bark":       m_bark,                 #[kg/s]
+            "P_recovery":   P_recovery*time,        #[MWh/yr]   
+            "P_bark":       P_bark*time,            #[MWh/yr]
+            "P_demand":     electricity_demand      #[MWh/yr]
         }
     
-    def estimate_emissions(self):
-        print(" I SHOULD DO THIS NOW, ALL EMISSION FACTORS, Vfluegas, CO2 emitted etc")
-    
+    def burn_fuel(self, technology_assumptions):
+
+        b = technology_assumptions["bark_increase"] #We need to update energy balances but save the old emissions!
+       
+        recovery_emissions = self.energybalance["recovery_capacity"] * technology_assumptions["factor_recovery"] /1000         
+        bark_emissions = self.energybalance["bark_capacity"] * technology_assumptions["factor_bark"] /1000  
+        extra_emissions = bark_emissions * b
+        bark_emissions += extra_emissions  
+
+        extra_biomass = self.energybalance["bark_capacity"] * b #[MWh/yr]
+        self.energybalance["bark_capacity"] += extra_biomass
+        self.energybalance["available_steam"] += extra_biomass
+        self.energybalance["extra_biomass"] = extra_biomass
+        self.energybalance["m_bark"] *= (1+b)
+        self.energybalance["P_bark"] *= (1+b)
+
+        V_fluegas = self.pulp_capacity * technology_assumptions["fluegas_intensity"] /self.energybalance_assumptions["time"] /3600 
+
+        self.gases = {
+            "recovery_emissions": recovery_emissions, #[ktCO2/yr]
+            "bark_emissions": bark_emissions,         #[ktCO2/yr]
+            "extra_emissions": extra_emissions,       #[ktCO2/yr]
+            "V_fluegas": V_fluegas                    #[kg/s]
+        }
+
+    def size_MEA(self, rate, pulp_interpolation):
+        
+        print("Making a simplified MEA calculation for now, but an Aspen interpolator is required!")
+        Q_reboiler = 3.6 * (self.gases["recovery_emissions"]*1000 * rate) /3.6 #[MWh/yr]
+        W_captureplant = 0.15*Q_reboiler
+
+        self.energybalance["Q_reboiler"] = Q_reboiler
+        self.energybalance["W_captureplant"] = W_captureplant
+
     def __repr__(self):
-        return (f"PulpPlant(Name={self.name}, Pulp Capacity={self.pulp_capacity}, Bark Capacity={self.bark_capacity}, "
+        return (f"PulpPlant(Name={self.name}, Pulp Capacity={self.pulp_capacity}, Bark Capacity={self.bark_share}, "
                 f"Recovery Boiler={self.recovery_boiler}, Bark Boiler={self.bark_boiler}, Heat Demand={self.heat_demand}, "
                 f"Electricity Demand={self.electricity_demand}, RP={self.rp}, RT={self.rt}, BP={self.bp}, BT={self.bt}, LP={self.lp})")
 
@@ -106,40 +143,47 @@ class MEA():
 # ------------ ABOVE THIS LINE WE DEFINE ALL CLASSES AND FUNCTIONS NEEDED FOR THE CCS_Pulp() MODEL --------
 
 def CCS_Pulp(
+        
     # Set Uncertainties, Levers and Constants (e.g. regressions or the initial/nominal plant values)
-    bark_usage = 130,
-    t = 25,
-    EnergySupply = "Steam",
+    BarkIncrease = "40",            #[%increase]
+    factor_recovery = 0.4106,       #[tCO2/MWh]
+    factor_bark = 0.322285714,
+    fluegas_intensity = 10188.75,   #[kg/t]
+    rate = 0.90,
+    SupplyStrategy = "Steam",
     pulp_interpolation=None,
     PulpPlant=None
 ):
-    # technology_assumptions = {
-    #     "eta_boiler": eta_boiler,
-    #     "rate": rate
-    # }
+    technology_assumptions = {
+        "bark_increase": int(BarkIncrease)/100,
+        "factor_recovery": factor_recovery,
+        "factor_bark": factor_bark,
+        "fluegas_intensity": fluegas_intensity,
+        "capture_rate": rate
+    }
     # economic_assumptions = {
     #     'alpha': alpha,
     #     'cMEA': cMEA
     # }¨
 
 
-    PulpPlant.estimate_emissions()
-    # PulpPlant.sendToAspen
+    PulpPlant.burn_fuel(technology_assumptions)
+
+    PulpPlant.size_MEA(rate, pulp_interpolation)
+
+    # if SupplyStrategy == "SteamHP":
+    #     PulpPlant.feed_and_condense()
+
+    # elif SupplyStrategy == "SteamLP":
+    #     PulpPlant.
 
 
 
 
-    print(f"Testing {PulpPlant.name} for bark usage={bark_usage}, t={t} and supply={EnergySupply}")
-    if EnergySupply == "Steam":
-        capture_cost = bark_usage
-        penalty_services = 140-bark_usage
-        penalty_biomass = bark_usage-100
+    capture_cost, penalty_services, penalty_biomass = [1,2,3]
 
-    elif EnergySupply == "HeatPumps":
-        capture_cost = 40
-        penalty_services = 100
-        penalty_biomass = t
-
+    print(PulpPlant.energybalance)
+    print(PulpPlant.gases)
     return capture_cost, penalty_services, penalty_biomass
 
 if __name__ == "__main__":
@@ -164,7 +208,7 @@ if __name__ == "__main__":
     pulp_plant = PulpPlant(
         name=plant_data['Name'],
         pulp_capacity=plant_data['Pulp capacity'],
-        bark_capacity=plant_data['Bark capacity'],
+        bark_share=plant_data['Bark capacity'],
         recovery_boiler=plant_data['Recovery boiler'],
         bark_boiler=plant_data['Bark boiler'],
         heat_demand=plant_data['Heat demand'],
