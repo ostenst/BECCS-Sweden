@@ -18,8 +18,7 @@ from ema_workbench import (
     Constant,
     Samplers,
     ema_logging,
-    perform_experiments,
-    save_results
+    perform_experiments
 )
 from pulp_model import (CCS_Pulp,PulpPlant,State,MEA)
 
