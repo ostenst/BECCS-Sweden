@@ -3,12 +3,11 @@
 # import numpy as np
 # from scipy.optimize import brentq
 
-# import matplotlib.pyplot as plt  
+import matplotlib.pyplot as plt  
 # from scipy.interpolate import LinearNDInterpolator
 # from ema_workbench.em_framework.evaluators import Samplers
 import seaborn as sns
 import pandas as pd
-from functions import *
 from ema_workbench import (
     Model,
     RealParameter,
@@ -20,7 +19,7 @@ from ema_workbench import (
     ema_logging,
     perform_experiments
 )
-from pulp_model import (CCS_Pulp,PulpPlant)
+from pulp_model import *
 
 # ------------------ Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("Pulp data.csv",delimiter=";")
@@ -72,7 +71,7 @@ model.uncertainties = [
     RealParameter("WACC", 0.03, 0.09),
     IntegerParameter("yexpenses", 2, 6),
     RealParameter("rescalation", 0.02, 0.06),
-    RealParameter("i", 0.05, 0.011),
+    RealParameter("i", 0.05, 0.11),
     IntegerParameter("t", 20, 30),
     RealParameter("celc", 20, 100),
     RealParameter("cbio", 30, 150),
@@ -95,7 +94,7 @@ model.constants = [
 ]
 
 ema_logging.log_to_stderr(ema_logging.INFO)
-n_scenarios = 30
+n_scenarios = 3
 n_policies = 3
 
 results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)

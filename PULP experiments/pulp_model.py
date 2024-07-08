@@ -148,8 +148,7 @@ class PulpPlant:
         b = self.bark_capacity
         a = ( self.available_steam - self.results["Q_reboiler"] )*1000
         if a < 0:
-            print(self.name, " available steam is insufficient to cover Qreb, consider purchasing grid power")
-            raise ValueError
+            raise ValueError(self.name, " available steam is insufficient to cover Qreb, consider purchasing grid power")
 
         time = self.energybalance_assumptions["time"]
         m_recovery = a * (r/(r+b)) /time /(self.states["live_recovery"].h-self.states["boiler"].h)          #[kg/s]
@@ -221,7 +220,8 @@ class PulpPlant:
         # Assume the remaining demand can be covered by recovery boiler LP steam
         m_recovery_utilized = remaining_demand/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)   #[kg/s]
         if m_recovery_utilized > self.m_recovery:
-            raise ValueError
+            print("-------", self.results["Q_reboiler"], Q_60C, (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)*self.m_recovery*time/1000)
+            raise ValueError(self.name, " LP steam is not enough! WEIRD, IT SHOULD BE ENOUGH...")
         P_recovery =  self.m_recovery * (live_recovery.h - LP_recovery.h) /1000                                             #[MW] All mass expands to LP level
         P_recovery += (self.m_recovery - m_recovery_utilized) * (LP_recovery.h - mix_recovery.h) /1000                      #[MW] Some mass expands to condensing level
 
@@ -299,9 +299,9 @@ class PulpPlant:
         print(f"{'Power Demand:':<20} {self.P_demand} MWh/yr")
 
 
-class MEA():
-    def __init__(self, Name):
-        self.Name = Name
+# class MEA():
+#     def __init__(self, Name):
+#         self.Name = Name
 
 # ------------ ABOVE THIS LINE WE DEFINE ALL CLASSES AND FUNCTIONS NEEDED FOR THE CCS_Pulp() MODEL --------
 
@@ -367,7 +367,6 @@ def CCS_Pulp(
         'cHP': cHP
     }
 
-    PulpPlant.print_energybalance()
     PulpPlant.burn_fuel(technology_assumptions)
     PulpPlant.size_MEA(rate, pulp_interpolation)
     
@@ -388,6 +387,9 @@ def CCS_Pulp(
 
     penalty_services = PulpPlant.results["P_lost"] /1000         #[GWh/yr]
     penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
+
+    PulpPlant.print_energybalance()
+    print(PulpPlant.gases)
 
     return capture_cost, penalty_services, penalty_biomass
 
