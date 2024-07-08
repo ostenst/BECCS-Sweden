@@ -115,8 +115,10 @@ class PulpPlant:
         bark_emissions += extra_emissions  
 
         extra_biomass = self.bark_capacity * b #[MWh/yr]
-        self.bark_capacity += extra_biomass
-        self.available_steam += extra_biomass
+        bark_new = self.bark_capacity + extra_biomass # Added this to avoid passing on increasing biomass to future model runs!
+        self.bark_capacity = bark_new
+        steam_new = self.available_steam + extra_biomass
+        self.available_steam = steam_new
         self.results["extra_biomass"] = extra_biomass
         self.m_bark *= (1+b)
         self.P_bark *= (1+b)
@@ -148,6 +150,8 @@ class PulpPlant:
         b = self.bark_capacity
         a = ( self.available_steam - self.results["Q_reboiler"] )*1000
         if a < 0:
+            self.print_energybalance()
+            print("Qreb=", self.results["Q_reboiler"] )
             raise ValueError(self.name, " available steam is insufficient to cover Qreb, consider purchasing grid power")
 
         time = self.energybalance_assumptions["time"]
@@ -160,7 +164,7 @@ class PulpPlant:
         dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - P_bark*time #NOTE: The loss in bark output is compared to the nominal case, therefore we need to adjust for the imagined bark increase
         P_lost = dP_recovery + dP_bark + self.results["W_captureplant"]
 
-        self.results["P_lost"] = P_lost #TODO: Check this P_lost, is it correct with MWh units?
+        self.results["P_lost"] = P_lost 
         self.available_steam = a/1000 
         self.m_recovery = m_recovery  
         self.m_bark = m_bark  
@@ -206,33 +210,79 @@ class PulpPlant:
         self.P_recovery = P_recovery * time  
         self.P_bark = P_bark * time 
 
-    def recover_and_supplement(self):
-        # Recover excess heat using pumps, supply residual demand with LP steam
-        time = self.energybalance_assumptions["time"]
-        live_recovery = self.states["live_recovery"]
-        mix_recovery = self.states["mix_recovery"]
-        LP_recovery = State("-", p=self.states["lp"], s=live_recovery.s, mix=True)
+    # def recover_and_supplement(self):
+    #     # Recover excess heat using pumps, supply residual demand with LP steam
+    #     time = self.energybalance_assumptions["time"]
+    #     live_recovery = self.states["live_recovery"]
+    #     mix_recovery = self.states["mix_recovery"]
+    #     LP_recovery = State("-", p=self.states["lp"], s=live_recovery.s, mix=True)
 
+    #     Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
+    #     P_HP = Q_60C/self.technology_assumptions["COP"]
+    #     remaining_demand = self.results["Q_reboiler"] - Q_60C
+
+    #     # Assume the remaining demand can be covered by recovery boiler LP steam NOT TRUE: NEED A MERIT ORDER HERE AS WELL:
+    #     m_recovery_utilized = remaining_demand/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)   #[kg/s]
+    #     if m_recovery_utilized > self.m_recovery:
+    #         self.print_energybalance()
+    #         print("Qreb=", self.results["Q_reboiler"] )
+    #         print("-------", self.results["Q_reboiler"], Q_60C, (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)*self.m_recovery*time/1000)
+    #         raise ValueError(self.name, " LP steam is not enough! WEIRD, IT SHOULD BE ENOUGH...")
+    #     P_recovery =  self.m_recovery * (live_recovery.h - LP_recovery.h) /1000                                             #[MW] All mass expands to LP level
+    #     P_recovery += (self.m_recovery - m_recovery_utilized) * (LP_recovery.h - mix_recovery.h) /1000                      #[MW] Some mass expands to condensing level
+
+    #     dP_recovery = self.P_recovery - P_recovery*time                                                                     #[MWh/yr]
+    #     dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - self.P_bark                                #Probably negative, since more power is available from bark
+    #     P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP
+        
+    #     self.results["P_lost"] = P_lost
+    #     self.results["Q_60C"] = Q_60C
+    #     self.m_recovery -= m_recovery_utilized 
+    #     self.P_recovery = P_recovery * time
+
+    def recover_and_supplement(self):
+        # Recover excess heat using pumps, supply residual demand with merit ordered steam
         Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
-        P_HP = Q_60C/self.technology_assumptions["COP"]
+        P_HP = Q_60C/self.technology_assumptions["COP"] #NOTE ATT THIS NOTE NOTE NOTE
         remaining_demand = self.results["Q_reboiler"] - Q_60C
 
-        # Assume the remaining demand can be covered by recovery boiler LP steam
-        m_recovery_utilized = remaining_demand/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)   #[kg/s]
-        if m_recovery_utilized > self.m_recovery:
-            print("-------", self.results["Q_reboiler"], Q_60C, (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)*self.m_recovery*time/1000)
-            raise ValueError(self.name, " LP steam is not enough! WEIRD, IT SHOULD BE ENOUGH...")
-        P_recovery =  self.m_recovery * (live_recovery.h - LP_recovery.h) /1000                                             #[MW] All mass expands to LP level
-        P_recovery += (self.m_recovery - m_recovery_utilized) * (LP_recovery.h - mix_recovery.h) /1000                      #[MW] Some mass expands to condensing level
+        time = self.energybalance_assumptions["time"]
+        live_recovery = self.states["live_recovery"]
+        live_bark = self.states["live_bark"]
+        mix_recovery = self.states["mix_recovery"]
+        mix_bark = self.states["mix_bark"]
 
-        dP_recovery = self.P_recovery - P_recovery*time                                                                     #[MWh/yr]
-        dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - self.P_bark                                #Probably negative, since more power is available from bark
-        P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP
+        LP_recovery = State("-", p=self.states["lp"], s=live_recovery.s, mix=True)
+        Qmax_recovery = self.m_recovery * (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h) #[kW]
+
+        LP_bark = State("-", p=self.states["lp"], s=live_bark.s, mix=True)
+        Qmax_bark = self.m_bark * (LP_bark.h - State("-", p=self.states["lp"], satL=True).h) #[kW]
+
+        capacities = [Qmax_recovery/1000*time, Qmax_bark/1000*time]
+        allocations, remaining_demand = self.merit_order_supply(remaining_demand, capacities)
+        if remaining_demand != 0:
+            print("... Qreb is too high, need to purchase Pgrid =", remaining_demand, self.results["Q_reboiler"])
+
+        # Now I must subtract the allocations from the capacities, and re-calculate the mass => power production
+        m_recovery_utilized = allocations[0]/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h) #[kg/s]
+        m_bark_utilized =     allocations[1]/time*1000 / (LP_bark.h     - State("-", p=self.states["lp"], satL=True).h) 
+
+        P_recovery =  self.m_recovery * (live_recovery.h - LP_recovery.h) /1000                         #[MW] All mass expands to LP level
+        P_recovery += (self.m_recovery - m_recovery_utilized) * (LP_recovery.h - mix_recovery.h) /1000  #[MW] Some mass expands to condensing level
+
+        P_bark =  self.m_bark * (live_bark.h - LP_bark.h) /1000
+        P_bark +=  (self.m_bark - m_bark_utilized) * (LP_bark.h - mix_bark.h) /1000
+
+        dP_recovery = self.P_recovery - P_recovery*time                                                 #[MWh/yr]
+        dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - P_bark*time
+        P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP + remaining_demand       # Any remaining demand needs purchased grid electricity
         
         self.results["P_lost"] = P_lost
         self.results["Q_60C"] = Q_60C
-        self.m_recovery -= m_recovery_utilized 
-        self.P_recovery = P_recovery * time
+        self.m_recovery -= m_recovery_utilized
+        self.m_bark -= m_bark_utilized 
+        self.P_recovery = P_recovery * time  
+        self.P_bark = P_bark * time 
 
     def merit_order_supply(self, Q_reboiler, capacities):
         remaining_demand = Q_reboiler
@@ -286,7 +336,8 @@ class PulpPlant:
         return energy_OPEX, other_OPEX
     
     def print_energybalance(self):
-        print(f"\n{'Recovery Capacity:':<20} {self.recovery_capacity}")
+        print(f"\n{'Supply Strategy:':<20} {self.technology_assumptions['SupplyStrategy']}")
+        print(f"{'Recovery Capacity:':<20} {self.recovery_capacity}")
         print(f"{'Bark Capacity:':<20} {self.bark_capacity}")
         print(f"{'Heat Demand:':<20} {self.heat_demand}")
         print(f"{'Electricity Demand:':<20} {self.electricity_demand}")
@@ -338,6 +389,7 @@ def CCS_Pulp(
     PulpPlant=None
 ):
     technology_assumptions = {
+        "SupplyStrategy": SupplyStrategy,
         "bark_increase": int(BarkIncrease)/100,
         "rate": rate,
         "factor_recovery": factor_recovery,
@@ -369,7 +421,7 @@ def CCS_Pulp(
 
     PulpPlant.burn_fuel(technology_assumptions)
     PulpPlant.size_MEA(rate, pulp_interpolation)
-    
+    PulpPlant.print_energybalance()
     if SupplyStrategy == "SteamHP":
         PulpPlant.feed_then_condense()
         
@@ -389,7 +441,7 @@ def CCS_Pulp(
     penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
 
     PulpPlant.print_energybalance()
-    print(PulpPlant.gases)
+    # print(PulpPlant.gases)
 
     return capture_cost, penalty_services, penalty_biomass
 
