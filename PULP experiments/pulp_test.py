@@ -6,6 +6,7 @@ from functions import *
 # https://odr.chalmers.se/items/be04dbdc-ede1-41fb-a96c-e0e7cdcd6862
 # https://www.sciencedirect.com/science/article/pii/S1750583622001074
 # https://www.mdpi.com/1996-1073/14/24/8499
+# COSTS: #This is TASC. #Cost Estimation Methodology for NETL Assessments of Power Plant Performancen NETL costs https://www.netl.doe.gov/projects/files/QGESSCostEstMethodforNETLAssessmentsofPowerPlantPerformance_022621.pdf 
 
 
 ## The idea for heat pumps is this:

@@ -1,5 +1,6 @@
 """This is what we do here."""
 import pandas as pd
+import numpy as np
 from pyXSteam.XSteam import XSteam
 
 steamTable = XSteam(XSteam.UNIT_SYSTEM_MKS)
@@ -120,13 +121,17 @@ class PulpPlant:
         self.m_bark *= (1+b)
         self.P_bark *= (1+b)
 
-        V_fluegas = self.pulp_capacity * technology_assumptions["fluegas_intensity"] /self.energybalance_assumptions["time"] /3600 
+        m_fluegas = self.pulp_capacity * technology_assumptions["fluegas_intensity"] /self.energybalance_assumptions["time"] /3600 #[kg/s]
+        n_fluegas = m_fluegas / technology_assumptions["molar_mass"]   #[kmol/s] Using mean molar mass [kg/kmol] 
+        V_fluegas = n_fluegas * 22.414  #[Nm3/s]  Using molar volume of ideal gas
 
         self.gases = {
-            "recovery_emissions": recovery_emissions, #[ktCO2/yr]
-            "bark_emissions": bark_emissions,         #[ktCO2/yr]
-            "extra_emissions": extra_emissions,       #[ktCO2/yr]
-            "V_fluegas": V_fluegas                    #[kg/s]
+            "recovery_emissions": recovery_emissions,                                   #[ktCO2/yr]
+            "bark_emissions": bark_emissions,                                           #[ktCO2/yr]
+            "extra_emissions": extra_emissions,                                         #[ktCO2/yr]
+            "captured_emissions": recovery_emissions*technology_assumptions["rate"],    #[ktCO2/yr]
+            "m_fluegas": m_fluegas,                                                     #[kg/s]
+            "V_fluegas": V_fluegas                                                      #[Nm3/s]
         }
 
     def size_MEA(self, rate, pulp_interpolation):        
@@ -180,7 +185,7 @@ class PulpPlant:
         capacities = [Qmax_recovery/1000*time, Qmax_bark/1000*time]
         allocations, remaining_demand = self.merit_order_supply(self.results["Q_reboiler"], capacities)
         if remaining_demand != 0:
-            print("... Qreb is too high, need to purchase Pgrid =", remaining_demand)
+            print("... Qreb is too high, need to purchase Pgrid =", remaining_demand, self.results["Q_reboiler"])
 
         # Now I must subtract the allocations from the capacities, and re-calculate the mass => power production
         m_recovery_utilized = allocations[0]/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h) #[kg/s]
@@ -206,12 +211,10 @@ class PulpPlant:
         # Recover excess heat using pumps, supply residual demand with LP steam
         time = self.energybalance_assumptions["time"]
         live_recovery = self.states["live_recovery"]
-        live_bark = self.states["live_bark"]
         mix_recovery = self.states["mix_recovery"]
-        mix_bark = self.states["mix_bark"]
         LP_recovery = State("-", p=self.states["lp"], s=live_recovery.s, mix=True)
 
-        Q_60C = (-29.998 + 1.248*self.pulp_capacity/1000 + 0.879*0 )*1000 #[MWh/yr]
+        Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
         P_HP = Q_60C/self.technology_assumptions["COP"]
         remaining_demand = self.results["Q_reboiler"] - Q_60C
 
@@ -227,6 +230,7 @@ class PulpPlant:
         P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP
         
         self.results["P_lost"] = P_lost
+        self.results["Q_60C"] = Q_60C
         self.m_recovery -= m_recovery_utilized 
         self.P_recovery = P_recovery * time
 
@@ -246,6 +250,40 @@ class PulpPlant:
                 allocations.append(0)
 
         return allocations, remaining_demand
+    
+    def CAPEX_MEA(self, economic_assumptions, SupplyStrategy, escalate=True):
+        self.economic_assumptions = economic_assumptions
+        X = economic_assumptions
+
+        CAPEX = X['alpha'] * (self.gases["V_fluegas"]) ** X['beta']  #[MEUR](Eliasson, 2021)
+        CAPEX *= X['CEPCI'] *1000                                    #[kEUR]
+        fixed_OPEX = X['fixed'] * CAPEX
+
+        if SupplyStrategy == "HeatPumps":
+            Q_60C = self.results["Q_60C"]                            #[MWh/yr]
+            Q_60C /= self.energybalance_assumptions["time"]          #[MW]    
+            CAPEX_60C = X["cHP"]*1000 * Q_60C                        #[kEUR], probably represents 2-4 pumps
+            CAPEX += CAPEX_60C   
+
+        if escalate:
+            CAPEX *= 1 + X['ownercost']
+            escalation = sum((1 + X['rescalation']) ** (n - 1) * (1 / X['yexpenses']) for n in range(1, X['yexpenses'] + 1))
+            cfunding = sum(X['WACC'] * (X['yexpenses'] - n + 1) * (1 + X['rescalation']) ** (n - 1) * (1 / X['yexpenses']) for n in range(1, X['yexpenses'] + 1))
+            CAPEX *= escalation + cfunding      
+
+        annualization = (X['i'] * (1 + X['i']) ** X['t']) / ((1 + X['i']) ** X['t'] - 1)
+        aCAPEX = annualization * CAPEX                    
+
+        return CAPEX, aCAPEX, fixed_OPEX                             #[kEUR] and [kEUR/yr]
+    
+    def OPEX_MEA(self, economic_assumptions):
+        P_lost = self.results["P_lost"]                                                                   #[MWh/yr] 
+        Q_extra = self.results["extra_biomass"]                                                           #[MWh/yr]
+        energy_OPEX = ( P_lost*economic_assumptions['celc'] + Q_extra*economic_assumptions['cbio'] )/1000 #[kEUR/yr]
+
+        print("Solvent cost requires Aspen data, make simple estimate.")
+        other_OPEX = 0.10*energy_OPEX + economic_assumptions['cMEA']
+        return energy_OPEX, other_OPEX
     
     def print_energybalance(self):
         print(f"\n{'Recovery Capacity:':<20} {self.recovery_capacity}")
@@ -270,64 +308,99 @@ class MEA():
 def CCS_Pulp(
         
     # Set Uncertainties, Levers and Constants (e.g. regressions or the initial/nominal plant values)
-    BarkIncrease = "40",            #[%increase]
     factor_recovery = 0.4106,       #[tCO2/MWh]
     factor_bark = 0.322285714,
     fluegas_intensity = 10188.75,   #[kg/t]
-    rate = 0.90,
     COP = 3,
-    SupplyStrategy = "SteamHP",
+    k = -29.998,
+    m = 1.248,
+
+    alpha=6.12,
+    beta=0.6336,
+    CEPCI=600/550,
+    fixed=0.06,
+    ownercost=0.2,
+    WACC=0.05,
+    yexpenses=3,
+    rescalation=0.03,
+    i=0.075,
+    t=25,
+    celc=40,
+    cbio=30,
+    cMEA=2,
+    cHP=0.86,                       #(Bergander & Hellander, 2024)
+
+    SupplyStrategy = "SteamLP",
+    rate = 0.90,
+    BarkIncrease = "40",            #[%increase]
+
     pulp_interpolation=None,
     PulpPlant=None
 ):
     technology_assumptions = {
         "bark_increase": int(BarkIncrease)/100,
+        "rate": rate,
         "factor_recovery": factor_recovery,
         "factor_bark": factor_bark,
         "fluegas_intensity": fluegas_intensity,
-        "capture_rate": rate,
-        "COP": COP
+        "COP": COP,
+        "molar_mass": 28.45, #[kg/kmol]
+        "k": k,
+        "m": m
     }
-    # economic_assumptions = {
-    #     'alpha': alpha,
-    #     'cMEA': cMEA
-    # }¨
+
+    economic_assumptions = {
+        'time': PulpPlant.energybalance_assumptions["time"],
+        'alpha': alpha,
+        'beta': beta,
+        'CEPCI': CEPCI,
+        'fixed': fixed,
+        'ownercost': ownercost,
+        'WACC': WACC,
+        'yexpenses': yexpenses,
+        'rescalation': rescalation,
+        'i': i,
+        't': t,
+        'celc': celc,
+        'cbio': cbio,
+        'cMEA': cMEA,
+        'cHP': cHP
+    }
 
     PulpPlant.print_energybalance()
     PulpPlant.burn_fuel(technology_assumptions)
-    PulpPlant.print_energybalance()
     PulpPlant.size_MEA(rate, pulp_interpolation)
     
     if SupplyStrategy == "SteamHP":
         PulpPlant.feed_then_condense()
-        PulpPlant.print_energybalance()
-        print(PulpPlant.results)
         
     elif SupplyStrategy == "SteamLP":
         PulpPlant.expand_then_feed()
-        PulpPlant.print_energybalance()
-        print(PulpPlant.results)
 
     elif SupplyStrategy == "HeatPumps":
         PulpPlant.recover_and_supplement()
-        PulpPlant.print_energybalance()
-        print(PulpPlant.results)
 
+    CAPEX, aCAPEX, fixed_OPEX = PulpPlant.CAPEX_MEA(economic_assumptions, SupplyStrategy, escalate=True)
+    energy_OPEX, other_OPEX = PulpPlant.OPEX_MEA(economic_assumptions)
 
-    capture_cost, penalty_services, penalty_biomass = [1,2,3]
+    costs = [CAPEX, aCAPEX, fixed_OPEX, energy_OPEX, other_OPEX] #[kEUR]
+    capture_cost = (aCAPEX + fixed_OPEX + energy_OPEX + other_OPEX) / (PulpPlant.gases["captured_emissions"]) #[kEUR/kt], ~half is energy opex
+
+    penalty_services = PulpPlant.results["P_lost"] /1000         #[GWh/yr]
+    penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
 
     return capture_cost, penalty_services, penalty_biomass
+
 
 if __name__ == "__main__":
 
     plants_df = pd.read_csv("Pulp data.csv",delimiter=";")
-    plant_data = plants_df.iloc[0]
+    plant_data = plants_df.iloc[4]
 
     # Load PulpAspen data
-    # Construct a PulpAspenInterpolator here, which will be re-used many times.
     interpolations = ["Interp1", "Interp2"]
 
-    # Initate a PulpPlant and calculate its nominal energy balance and volume flow.
+    # Initate a PulpPlant and calculate its nominal energy balance
     energybalance_assumptions = {
         "recovery_intensity": 18,       #[GJ/t]
         "bark_intensity": 4.2,          #[GJ/t] Although I don't think this will be needed! Since we estimate bark as a fraction of recovery.
@@ -352,9 +425,9 @@ if __name__ == "__main__":
         lp=plant_data['LP'],
         energybalance_assumptions=energybalance_assumptions
     )
-
+    print(f"||| MODELLING {pulp_plant.name} PULP MILL |||")
     pulp_plant.estimate_nominal_cycle() 
 
     # The RDM evaluation starts below:
-    capture_cost, penalty_services, penalty_biomass = CCS_Pulp(PulpPlant = pulp_plant, pulp_interpolation = interpolations)
+    capture_cost, penalty_services, penalty_biomass = CCS_Pulp(PulpPlant=pulp_plant, pulp_interpolation=interpolations)
     print("Outcomes: ", capture_cost, penalty_services, penalty_biomass)
