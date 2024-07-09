@@ -94,8 +94,8 @@ model.constants = [
 ]
 
 ema_logging.log_to_stderr(ema_logging.INFO)
-n_scenarios = 3
-n_policies = 3
+n_scenarios = 100
+n_policies = 30
 
 results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
 experiments, outcomes = results
@@ -109,6 +109,6 @@ df_outcomes = pd.DataFrame(outcomes)
 df_outcomes["Name"] = pulp_plant.name
 df_outcomes.to_csv("outcomes.csv", index=False)
 
-df_outcomes["policy"] = experiments["policy"]
-sns.pairplot(df_outcomes, hue="policy", vars=list(outcomes.keys()))
+df_outcomes["SupplyStrategy"] = experiments["SupplyStrategy"]
+sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys()))
 plt.show()

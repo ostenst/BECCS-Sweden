@@ -1,5 +1,6 @@
 """This is what we do here."""
 import pandas as pd
+import copy
 import numpy as np
 from pyXSteam.XSteam import XSteam
 
@@ -33,7 +34,7 @@ class State:
             raise ValueError("Steam properties cannot be determined")
 
 class PulpPlant:
-    def __init__(self, name, pulp_capacity, bark_share, recovery_boiler, bark_boiler, heat_demand, electricity_demand, rp, rt, bp, bt, lp, energybalance_assumptions=None):
+    def __init__(self, name, pulp_capacity, bark_share, recovery_boiler, bark_boiler, heat_demand, electricity_demand, rp, rt, bp, bt, lp, energybalance_assumptions):
         self.name = name
         self.pulp_capacity = pulp_capacity
         self.bark_share = bark_share
@@ -63,6 +64,7 @@ class PulpPlant:
 
         self.gases = {}
         self.results = {}
+        self.nominal_state = {}
     
     def estimate_nominal_cycle(self):
         # Calculating available steam
@@ -104,6 +106,8 @@ class PulpPlant:
         self.P_recovery = P_recovery * time  
         self.P_bark = P_bark * time 
         self.P_demand = electricity_demand 
+        # This is a dict with the attribute values of the nominal state. But we have to exclude the initial 'nominal_state' from being copied!
+        self.nominal_state = copy.deepcopy({k: v for k, v in self.__dict__.items() if k != 'nominal_state'})
     
     def burn_fuel(self, technology_assumptions):
         self.technology_assumptions = technology_assumptions
@@ -115,10 +119,8 @@ class PulpPlant:
         bark_emissions += extra_emissions  
 
         extra_biomass = self.bark_capacity * b #[MWh/yr]
-        bark_new = self.bark_capacity + extra_biomass # Added this to avoid passing on increasing biomass to future model runs!
-        self.bark_capacity = bark_new
-        steam_new = self.available_steam + extra_biomass
-        self.available_steam = steam_new
+        self.bark_capacity += extra_biomass
+        self.available_steam += extra_biomass
         self.results["extra_biomass"] = extra_biomass
         self.m_bark *= (1+b)
         self.P_bark *= (1+b)
@@ -187,8 +189,6 @@ class PulpPlant:
 
         capacities = [Qmax_recovery/1000*time, Qmax_bark/1000*time]
         allocations, remaining_demand = self.merit_order_supply(self.results["Q_reboiler"], capacities)
-        if remaining_demand != 0:
-            print("... Qreb is too high, need to purchase Pgrid =", remaining_demand, self.results["Q_reboiler"])
 
         # Now I must subtract the allocations from the capacities, and re-calculate the mass => power production
         m_recovery_utilized = allocations[0]/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h) #[kg/s]
@@ -210,36 +210,6 @@ class PulpPlant:
         self.P_recovery = P_recovery * time  
         self.P_bark = P_bark * time 
 
-    # def recover_and_supplement(self):
-    #     # Recover excess heat using pumps, supply residual demand with LP steam
-    #     time = self.energybalance_assumptions["time"]
-    #     live_recovery = self.states["live_recovery"]
-    #     mix_recovery = self.states["mix_recovery"]
-    #     LP_recovery = State("-", p=self.states["lp"], s=live_recovery.s, mix=True)
-
-    #     Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
-    #     P_HP = Q_60C/self.technology_assumptions["COP"]
-    #     remaining_demand = self.results["Q_reboiler"] - Q_60C
-
-    #     # Assume the remaining demand can be covered by recovery boiler LP steam NOT TRUE: NEED A MERIT ORDER HERE AS WELL:
-    #     m_recovery_utilized = remaining_demand/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)   #[kg/s]
-    #     if m_recovery_utilized > self.m_recovery:
-    #         self.print_energybalance()
-    #         print("Qreb=", self.results["Q_reboiler"] )
-    #         print("-------", self.results["Q_reboiler"], Q_60C, (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h)*self.m_recovery*time/1000)
-    #         raise ValueError(self.name, " LP steam is not enough! WEIRD, IT SHOULD BE ENOUGH...")
-    #     P_recovery =  self.m_recovery * (live_recovery.h - LP_recovery.h) /1000                                             #[MW] All mass expands to LP level
-    #     P_recovery += (self.m_recovery - m_recovery_utilized) * (LP_recovery.h - mix_recovery.h) /1000                      #[MW] Some mass expands to condensing level
-
-    #     dP_recovery = self.P_recovery - P_recovery*time                                                                     #[MWh/yr]
-    #     dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - self.P_bark                                #Probably negative, since more power is available from bark
-    #     P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP
-        
-    #     self.results["P_lost"] = P_lost
-    #     self.results["Q_60C"] = Q_60C
-    #     self.m_recovery -= m_recovery_utilized 
-    #     self.P_recovery = P_recovery * time
-
     def recover_and_supplement(self):
         # Recover excess heat using pumps, supply residual demand with merit ordered steam
         Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
@@ -260,8 +230,6 @@ class PulpPlant:
 
         capacities = [Qmax_recovery/1000*time, Qmax_bark/1000*time]
         allocations, remaining_demand = self.merit_order_supply(remaining_demand, capacities)
-        if remaining_demand != 0:
-            print("... Qreb is too high, need to purchase Pgrid =", remaining_demand, self.results["Q_reboiler"])
 
         # Now I must subtract the allocations from the capacities, and re-calculate the mass => power production
         m_recovery_utilized = allocations[0]/time*1000 / (LP_recovery.h - State("-", p=self.states["lp"], satL=True).h) #[kg/s]
@@ -349,10 +317,13 @@ class PulpPlant:
         print(f"{'Power Bark:':<20} {self.P_bark} MWh/yr")
         print(f"{'Power Demand:':<20} {self.P_demand} MWh/yr")
 
+        for key,value in self.results.items():
+            print(f"{' ':<5} {key:<20} {value}")
+        for key,value in self.gases.items():
+            print(f"{key:<20} {value}")
 
-# class MEA():
-#     def __init__(self, Name):
-#         self.Name = Name
+    def reset(self):
+        self.__dict__.update(copy.deepcopy(self.nominal_state)) # Resets to the nominal state values
 
 # ------------ ABOVE THIS LINE WE DEFINE ALL CLASSES AND FUNCTIONS NEEDED FOR THE CCS_Pulp() MODEL --------
 
@@ -421,7 +392,7 @@ def CCS_Pulp(
 
     PulpPlant.burn_fuel(technology_assumptions)
     PulpPlant.size_MEA(rate, pulp_interpolation)
-    PulpPlant.print_energybalance()
+
     if SupplyStrategy == "SteamHP":
         PulpPlant.feed_then_condense()
         
@@ -439,9 +410,9 @@ def CCS_Pulp(
 
     penalty_services = PulpPlant.results["P_lost"] /1000         #[GWh/yr]
     penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
+    # PulpPlant.print_energybalance()
 
-    PulpPlant.print_energybalance()
-    # print(PulpPlant.gases)
+    PulpPlant.reset() #Save the values you want to return, before resetting!
 
     return capture_cost, penalty_services, penalty_biomass
 
