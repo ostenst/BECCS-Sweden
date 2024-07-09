@@ -139,7 +139,7 @@ class PulpPlant:
         }
 
     def size_MEA(self, rate, pulp_interpolation):        
-        print("Making a simplified MEA calculation for now, but an Aspen interpolator is required!")
+        # print("Making a simplified MEA calculation for now, but an Aspen interpolator is required!")
         Q_reboiler = 3.6 * (self.gases["recovery_emissions"]*1000 * rate) /3.6 #[MWh/yr]
         W_captureplant = 0.15*Q_reboiler
 
@@ -148,13 +148,15 @@ class PulpPlant:
 
     def feed_then_condense(self):    
         # Re-calculate all capacities, after available steam has been reduced by Q_reboiler
+        remaining_demand = self.results["Q_reboiler"] - self.available_steam
+        if remaining_demand < 0: # Then the steam is enough 
+            a = -remaining_demand *1000 #[kWh/yr]
+            remaining_demand = 0
+        else:
+            print("----------------Steam is not enough")
+            a = 0
         r = self.recovery_capacity
         b = self.bark_capacity
-        a = ( self.available_steam - self.results["Q_reboiler"] )*1000
-        if a < 0:
-            self.print_energybalance()
-            print("Qreb=", self.results["Q_reboiler"] )
-            raise ValueError(self.name, " available steam is insufficient to cover Qreb, consider purchasing grid power")
 
         time = self.energybalance_assumptions["time"]
         m_recovery = a * (r/(r+b)) /time /(self.states["live_recovery"].h-self.states["boiler"].h)          #[kg/s]
@@ -164,7 +166,7 @@ class PulpPlant:
 
         dP_recovery = self.P_recovery - P_recovery*time                                                     #[MWh/yr]
         dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - P_bark*time #NOTE: The loss in bark output is compared to the nominal case, therefore we need to adjust for the imagined bark increase
-        P_lost = dP_recovery + dP_bark + self.results["W_captureplant"]
+        P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] - remaining_demand  #NOTE: sign should be ok, but double check!
 
         self.results["P_lost"] = P_lost 
         self.available_steam = a/1000 
@@ -299,7 +301,7 @@ class PulpPlant:
         Q_extra = self.results["extra_biomass"]                                                           #[MWh/yr]
         energy_OPEX = ( P_lost*economic_assumptions['celc'] + Q_extra*economic_assumptions['cbio'] )/1000 #[kEUR/yr]
 
-        print("Solvent cost requires Aspen data, make simple estimate.")
+        # print("Solvent cost requires Aspen data, make simple estimate.")
         other_OPEX = 0.10*energy_OPEX + economic_assumptions['cMEA']
         return energy_OPEX, other_OPEX
     
@@ -412,7 +414,7 @@ def CCS_Pulp(
     penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
     # PulpPlant.print_energybalance()
 
-    PulpPlant.reset() #Save the values you want to return, before resetting!
+    PulpPlant.reset() # NOTE: Save the values you want to return (e.g. costs, capturedemissions-extraemissions etc.), before resetting!
 
     return capture_cost, penalty_services, penalty_biomass
 
