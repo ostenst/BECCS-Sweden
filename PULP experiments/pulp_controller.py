@@ -1,11 +1,12 @@
 """Stuff here controller"""
+
 # import math
 # import numpy as np
 # from scipy.optimize import brentq
-
-import matplotlib.pyplot as plt  
 # from scipy.interpolate import LinearNDInterpolator
 # from ema_workbench.em_framework.evaluators import Samplers
+from pulp_model import *
+import matplotlib.pyplot as plt  
 import seaborn as sns
 import pandas as pd
 from ema_workbench import (
@@ -19,11 +20,11 @@ from ema_workbench import (
     ema_logging,
     perform_experiments
 )
-from pulp_model import *
+from ema_workbench.analysis import prim
 
-# ------------------ Read data and initiate a plant ----------------------------------
+# -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("Pulp data.csv",delimiter=";")
-plant_data = plants_df.iloc[0]
+plant_data = plants_df.iloc[5]
 print(f"||| MODELLING {plant_data['Name']} PULP MILL |||")
 interpolations = ["Interp1", "Interp2"]
 
@@ -53,7 +54,7 @@ pulp_plant = PulpPlant(
 )
 pulp_plant.estimate_nominal_cycle() 
 
-# ------------------ Begin RDM analysis  ---------------------------------------------
+# ----------------------------------------- Begin RDM analysis  ---------------------------------------------
 model = Model("CCSproblem", function=CCS_Pulp)
 model.uncertainties = [
     RealParameter("factor_recovery", 0.38, 0.44),       #[tCO2/MWh]
@@ -94,13 +95,13 @@ model.constants = [
 ]
 
 ema_logging.log_to_stderr(ema_logging.INFO)
-n_scenarios = 3
-n_policies = 3
+n_scenarios = 250
+n_policies = 40
 
 results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
 experiments, outcomes = results
 
-# ------------------ Process results  ---------------------------------------------
+# ---------------------------------------- Process results  ---------------------------------------------
 df_experiments = pd.DataFrame(experiments)
 df_experiments["Name"] = pulp_plant.name
 df_experiments.to_csv("experiments.csv", index=False)
@@ -109,6 +110,29 @@ df_outcomes = pd.DataFrame(outcomes)
 df_outcomes["Name"] = pulp_plant.name
 df_outcomes.to_csv("outcomes.csv", index=False)
 
-df_outcomes["policy"] = experiments["policy"]
-sns.pairplot(df_outcomes, hue="policy", vars=list(outcomes.keys()))
+# Launching PRIM algorithm
+# zero_biomass_boolean = (df_experiments["BarkIncrease"] == "0")
+# y = df_outcomes["capture_cost"]<70
+# y = df_outcomes["penalty_services"]<300 
+# y = df_outcomes["penalty_biomass"]==0 
+y = (df_outcomes["capture_cost"] < 80) & (df_outcomes["penalty_services"] < 600) & (df_outcomes["penalty_biomass"] < 200)
+
+x = df_experiments.iloc[:, 0:23]
+print("The number of interesting cases are:\n", y.value_counts())
+
+prim_alg = prim.Prim(x, y, threshold=0.8, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel)
+box1 = prim_alg.find_box()
+
+box1.show_ppt()             # Lines tradeoff
+box1.show_tradeoff()        # Pareto tradeoff 
+box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
+
+box1.select(8)
+box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
+prim_alg.show_boxes(8) 
+prim_alg.boxes_to_dataframe() # Save boxes here?
+box1.inspect(8)
+
+df_outcomes["SupplyStrategy"] = experiments["SupplyStrategy"]
+sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys()))
 plt.show()
