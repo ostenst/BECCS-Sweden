@@ -407,16 +407,29 @@ def CCS_Pulp(
     CAPEX, aCAPEX, fixed_OPEX = PulpPlant.CAPEX_MEA(economic_assumptions, SupplyStrategy, escalate=True)
     energy_OPEX, other_OPEX = PulpPlant.OPEX_MEA(economic_assumptions)
 
-    costs = [CAPEX, aCAPEX, fixed_OPEX, energy_OPEX, other_OPEX] #[kEUR]
-    capture_cost = (aCAPEX + fixed_OPEX + energy_OPEX + other_OPEX) / (PulpPlant.gases["captured_emissions"]) #[kEUR/kt], ~half is energy opex
+    costs = [
+        ["CAPEX",       CAPEX], 
+        ["aCAPEX",      aCAPEX], 
+        ["fixed_OPEX",  fixed_OPEX], 
+        ["energy_OPEX", energy_OPEX], 
+        ["other_OPEX",  other_OPEX]
+    ] #[kEUR]
 
+    emissions = PulpPlant.gases
+    emissions = [
+        ["nominal", emissions["recovery_emissions"]+emissions["bark_emissions"]], 
+        ["gross",   emissions["recovery_emissions"]+emissions["bark_emissions"]+emissions["extra_emissions"]], 
+        ["captured",emissions["captured_emissions"]],
+        ["net",     emissions["recovery_emissions"]+emissions["bark_emissions"]+emissions["extra_emissions"]-emissions["captured_emissions"]] 
+    ] #[ktCO2/yr]
+
+    capture_cost = (aCAPEX + fixed_OPEX + energy_OPEX + other_OPEX) / (PulpPlant.gases["captured_emissions"]) #[kEUR/kt], ~half is energy opex
     penalty_services = PulpPlant.results["P_lost"] /1000         #[GWh/yr]
     penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
     # PulpPlant.print_energybalance()
 
-    PulpPlant.reset() # NOTE: Save the values you want to return (e.g. costs, capturedemissions-extraemissions etc.), before resetting!
-
-    return capture_cost, penalty_services, penalty_biomass
+    PulpPlant.reset()
+    return capture_cost, penalty_services, penalty_biomass, costs, emissions
 
 
 if __name__ == "__main__":
@@ -456,5 +469,5 @@ if __name__ == "__main__":
     pulp_plant.estimate_nominal_cycle() 
 
     # The RDM evaluation starts below:
-    capture_cost, penalty_services, penalty_biomass = CCS_Pulp(PulpPlant=pulp_plant, pulp_interpolation=interpolations)
-    print("Outcomes: ", capture_cost, penalty_services, penalty_biomass)
+    capture_cost, penalty_services, penalty_biomass, costs, emissions = CCS_Pulp(PulpPlant=pulp_plant, pulp_interpolation=interpolations)
+    print("Outcomes: ", capture_cost, penalty_services, penalty_biomass, costs, emissions)
