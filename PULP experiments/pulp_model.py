@@ -392,6 +392,7 @@ def CCS_Pulp(
         'cHP': cHP
     }
 
+    # Run model functions
     PulpPlant.burn_fuel(technology_assumptions)
     PulpPlant.size_MEA(rate, pulp_interpolation)
 
@@ -406,7 +407,9 @@ def CCS_Pulp(
 
     CAPEX, aCAPEX, fixed_OPEX = PulpPlant.CAPEX_MEA(economic_assumptions, SupplyStrategy, escalate=True)
     energy_OPEX, other_OPEX = PulpPlant.OPEX_MEA(economic_assumptions)
+    # PulpPlant.print_energybalance()
 
+    # Save results. Importantly, absolute penalties [GWh] are important for society, specific [MWh/t] for technologies/PRIM
     costs = [
         ["CAPEX",       CAPEX], 
         ["aCAPEX",      aCAPEX], 
@@ -424,9 +427,8 @@ def CCS_Pulp(
     ] #[ktCO2/yr]
 
     capture_cost = (aCAPEX + fixed_OPEX + energy_OPEX + other_OPEX) / (PulpPlant.gases["captured_emissions"]) #[kEUR/kt], ~half is energy opex
-    penalty_services = PulpPlant.results["P_lost"] /1000         #[GWh/yr]
-    penalty_biomass  = PulpPlant.results["extra_biomass"] /1000  #[GWh/yr]
-    # PulpPlant.print_energybalance()
+    penalty_services = PulpPlant.results["P_lost"]                  / (PulpPlant.gases["captured_emissions"]) #[MWh/kt]
+    penalty_biomass  = PulpPlant.results["extra_biomass"]           / (PulpPlant.gases["captured_emissions"]) #[MWh/kt]
 
     PulpPlant.reset()
     return capture_cost, penalty_services, penalty_biomass, costs, emissions
