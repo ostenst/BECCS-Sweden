@@ -527,7 +527,6 @@ def CCS_CHP(
     penalty_biomass  = CHP.results["Qextra"]          / (CHP.gases["captured_emissions"])                                       #[MWh/kt]        
 
     CHP.print_energybalance()
-    CHP.plot_hexchange()
     CHP.reset()
     return capture_cost, penalty_services, penalty_biomass, costs, emissions
 
