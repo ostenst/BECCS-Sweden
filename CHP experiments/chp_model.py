@@ -122,18 +122,18 @@ class CHP_plant:
     def burn_fuel(self, technology_assumptions):
         self.technology_assumptions = technology_assumptions
 
-        # 362 MWfuel produces 172 kgfluegas/s in Tharun's study.
+        # 362 MWfuel produces 172 kgfluegas/s in Tharun's study
         m_fluegas = 174/362 * self.Qfuel                               #[kg/s]
         n_fluegas = m_fluegas / technology_assumptions["molar_mass"]   #[kmol/s] Using mean molar mass [kg/kmol] 
         V_fluegas = n_fluegas * 22.414                                 #[Nm3/s]  Using molar volume of ideal gas
 
-        # Now calculating CO2
+        # Now calculating CO2 from %CO2
         V_CO2 = V_fluegas*0.16  #[m3CO2/s]
         n_CO2 = V_CO2/22.414    #[kmolCO2/s]
         m_CO2 = n_CO2*44        #[kg/s]
 
-        duration = self.energybalance_assumptions["time"]
-        duration_increase = self.technology_assumptions["duration_increase"]
+        duration = technology_assumptions["time"]
+        duration_increase = technology_assumptions["duration_increase"]
 
         self.results["Qextra"] = self.Qfuel*duration_increase #[MWh/yr]
         self.gases = {
@@ -245,6 +245,8 @@ class CHP_plant:
             for component, data in stream_data.items():
                 TIN = data['Tin']
                 TOUT = data['Tout']
+                if TIN == TOUT:
+                    TIN += 0.001 # To avoid division by zero
                 Q = data['Q']
                 C = Q/(TIN-TOUT)
                 
@@ -295,6 +297,8 @@ class CHP_plant:
         Qsupp = linear_interpolation(curve, Tsupp)
         Qlow = linear_interpolation(curve, Tlow)
         Qpinch, Tpinch = curve[max_curvature_index][0], curve[max_curvature_index][1]
+        if Qlow < Qpinch:
+            Qlow = Qpinch # Sometimes Qlow is poorly estimated, then just set the low grade heat to zero
         Qhex = (Qpinch-Qsupp) + (Qlow-Qpinch)
 
         Qhp = composite_curve[-1][0] - Qlow
@@ -315,7 +319,7 @@ class CHP_plant:
         }
 
         if Qhex<0 or Qhp<0:
-            self.plot_hexchange()
+            self.plot_hexchange(show=True)
             raise ValueError("Infeasible heat exchange")
         return
 
@@ -332,7 +336,7 @@ class CHP_plant:
         Qhex = self.results["Qrecovered"] - self.technology_assumptions["heat_pump"] #[MW]
         U = self.technology_assumptions["U"] /1000                                   #[kW/m2K]
         A = Qhex*1000/(U * self.technology_assumptions["dTmin"])
-        CAPEX_hex = 0.571*A**0.9145                                                  #[kEUR] (Eliasson, 2022)
+        CAPEX_hex = X["cHEX"]*A**0.9145                                                  #[kEUR] Original val: 0.571 (Eliasson, 2022)
         CAPEX += CAPEX_hex
 
         # Adding cost of HP (+~25% cost)
@@ -445,6 +449,8 @@ def CCS_CHP(
     cMEA=2,
     cHP=0.86,                       #(Bergander & Hellander, 2024)
     cHEX=0.571,                     # check units in (Eliasson, 2022)
+    
+    time=5000,
 
     duration_increase="1000",       #[h/yr]
     # HEX_optimization="100",         #[% of optimal] everybody optimizes this, no reason to include!
@@ -456,6 +462,7 @@ def CCS_CHP(
 ):
     technology_assumptions = {
         'U': CHP.energybalance_assumptions["U"],
+        "time": time,
         "duration_increase": int(duration_increase),
         # "HEX_optimization": int(HEX_optimization),
         "rate": rate,
@@ -470,7 +477,7 @@ def CCS_CHP(
     }
 
     economic_assumptions = {
-        'time': CHP.energybalance_assumptions["time"],
+        'time': time,
         'alpha': alpha,
         'beta': beta,
         'CEPCI': CEPCI,
@@ -526,7 +533,7 @@ def CCS_CHP(
     penalty_services = (penalty_power + penalty_heat) / (CHP.gases["captured_emissions"])                                       #[MWh/kt]
     penalty_biomass  = CHP.results["Qextra"]          / (CHP.gases["captured_emissions"])                                       #[MWh/kt]        
 
-    CHP.print_energybalance()
+    # CHP.print_energybalance()
     CHP.reset()
     return capture_cost, penalty_services, penalty_biomass, costs, emissions
 
@@ -543,8 +550,10 @@ if __name__ == "__main__":
 
     # Initate a CHP and calculate its nominal energy balance
     energybalance_assumptions = {
-        "time": 5500,                    #[h/yr]
+        # "time": 5500,                    #[h/yr]
         "U": 1500                        #[W/m2K]
+        # "m_fluegas": simplified from Tharun's study
+        # "HEX costs": taken from Eliasson (2022)
     }
 
     CHP = CHP_plant(
