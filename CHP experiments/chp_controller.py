@@ -22,7 +22,7 @@ from ema_workbench import (
     perform_experiments
 )
 from ema_workbench.analysis import prim
-from prim_constrained import *
+# from prim_constrained import *
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("CHP data.csv",delimiter=";")
@@ -63,7 +63,7 @@ for index, plant_data in plants_df.iterrows():
     model.uncertainties = [
         RealParameter("dTreb", 7, 14),       #[tCO2/MWh]
         RealParameter("Tsupp", 78, 100),
-        RealParameter("Tlow", 30, 45),      #[kg/t]
+        RealParameter("Tlow", 43, 55),       #[kg/t]
         RealParameter("COP", 2.3, 3.8),
         RealParameter("dTmin", 5, 12),
 
@@ -78,11 +78,11 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("i", 0.05, 0.11),
         IntegerParameter("t", 20, 30),
         RealParameter("celc", 20, 100),
-        RealParameter("cheat", 30, 150),         # replaced 'm' with 'cheat'
+        RealParameter("cheat", 30, 150),        
         RealParameter("cbio", 30, 60),
         RealParameter("cMEA", 1.5, 2.5),
         RealParameter("cHP", 0.76, 0.96),
-        RealParameter("cHEX", 0.500, 0.600),     # added 'cHEX'
+        RealParameter("cHEX", 0.500, 0.600),  
 
         RealParameter("time", 4000, 6000),
     ]
@@ -153,42 +153,42 @@ y = df_outcomes["capture_cost"] < 10
 x = all_experiments.iloc[:, 0:23]
 print("The number of interesting cases are:\n", y.value_counts())
 
-Data = PrimedData(x,y)
-peeling_trajectory = []
-box = Box(id=0)
-box.calculate(Data)
+# Data = PrimedData(x,y)
+# peeling_trajectory = []
+# box = Box(id=0)
+# box.calculate(Data)
 
-print(" ISSUE: MY PRIM ALGORITHM DOES NOT RECOGNIZE CATEGORICAL FEATURES; THAT'S WHY IT'S WORSE. MAYBE ADJUST IT AND HARD-CODE WHAT IS CATEGORICAL OR NOT, AS AN ARGUMENT")
-peeling_trajectory = prim_recursive(Data,box,peeling_trajectory,max_iterations=40, constrained_to=None, objective_function="LENIENT2")
-# peeling_trajectory = prim_recursive(Data,box,peeling_trajectory,max_iterations=40, constrained_to=["Cellulosic cost", "Biomass backstop price", "Pricing"], objective_function="LENIENT2")
-peeling_trajectory[7].print_info()
-peeling_trajectory[19].print_info()
+# print(" ISSUE: MY PRIM ALGORITHM DOES NOT RECOGNIZE CATEGORICAL FEATURES; THAT'S WHY IT'S WORSE. MAYBE ADJUST IT AND HARD-CODE WHAT IS CATEGORICAL OR NOT, AS AN ARGUMENT")
+# peeling_trajectory = prim_recursive(Data,box,peeling_trajectory,max_iterations=40, constrained_to=None, objective_function="LENIENT2")
+# # peeling_trajectory = prim_recursive(Data,box,peeling_trajectory,max_iterations=40, constrained_to=["Cellulosic cost", "Biomass backstop price", "Pricing"], objective_function="LENIENT2")
+# peeling_trajectory[7].print_info()
+# peeling_trajectory[19].print_info()
 
-x_values = [box.coverage for box in peeling_trajectory]
-y_values = [box.density for box in peeling_trajectory]
-colors = [box.n_lims for box in peeling_trajectory]
-colors = np.array(colors, dtype=int)
-num_colors = len(set(colors))
-cmap = plt.cm.get_cmap('tab10', num_colors)
-plt.scatter(x_values, y_values, c=colors, cmap=cmap, alpha=0.8)
-plt.xlabel('Coverage')
-plt.ylabel('Density')
-plt.colorbar(label='Number of Limits')
+# x_values = [box.coverage for box in peeling_trajectory]
+# y_values = [box.density for box in peeling_trajectory]
+# colors = [box.n_lims for box in peeling_trajectory]
+# colors = np.array(colors, dtype=int)
+# num_colors = len(set(colors))
+# cmap = plt.cm.get_cmap('tab10', num_colors)
+# plt.scatter(x_values, y_values, c=colors, cmap=cmap, alpha=0.8)
+# plt.xlabel('Coverage')
+# plt.ylabel('Density')
+# plt.colorbar(label='Number of Limits')
 
 
-# prim_alg = prim.Prim(x, y, threshold=0.6, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
-# box1 = prim_alg.find_box()
+prim_alg = prim.Prim(x, y, threshold=0.6, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
+box1 = prim_alg.find_box()
 
-# # plt.clf()
-# box1.show_ppt()             # Lines tradeoff
-# box1.show_tradeoff()        # Pareto tradeoff 
-# box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
+# plt.clf()
+box1.show_ppt()             # Lines tradeoff
+box1.show_tradeoff()        # Pareto tradeoff 
+box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
 
-# box1.select(14)
-# # box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
-# prim_alg.show_boxes(14) 
-# prim_alg.boxes_to_dataframe() # Save boxes here?
-# box1.inspect(14)
+box1.select(14)
+# box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
+prim_alg.show_boxes(14) 
+prim_alg.boxes_to_dataframe() # Save boxes here?
+box1.inspect(14)
 
 all_experiments.to_csv("all_experiments.csv", index=False)
 all_outcomes.to_csv("all_outcomes.csv", index=False)
