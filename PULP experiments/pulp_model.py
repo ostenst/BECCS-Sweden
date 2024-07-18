@@ -212,6 +212,10 @@ class PulpPlant:
         self.P_recovery = P_recovery * time  
         self.P_bark = P_bark * time 
 
+        # if self.name == "Varo" or self.name == "Monsteros" and self.technology_assumptions["bark_increase"]==0:
+        #     # These have weirdly different P_lost values BUG: Is this a bug or working properly? Why are these two plants so different?
+        #     print("dP share:", dP_recovery/P_lost, P_lost, self.technology_assumptions["bark_increase"]) 
+
     def recover_and_supplement(self):
         # Recover excess heat using pumps, supply residual demand with merit ordered steam
         Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
@@ -246,6 +250,10 @@ class PulpPlant:
         dP_recovery = self.P_recovery - P_recovery*time                                                 #[MWh/yr]
         dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - P_bark*time
         P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP + remaining_demand       # Any remaining demand needs purchased grid electricity
+
+        # if self.name == "Varo" or self.name == "Monsteros":
+        #     # These have weirdly different P_lost values
+        #     print("dP share:", dP_recovery/P_lost, P_lost)
         
         self.results["P_lost"] = P_lost
         self.results["Q_60C"] = Q_60C

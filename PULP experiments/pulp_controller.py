@@ -62,8 +62,8 @@ for index, plant_data in plants_df.iterrows():
     # ----------------------------------------- Begin RDM analysis  ---------------------------------------------
     model = Model("CCSproblem", function=CCS_Pulp)
     model.uncertainties = [
-        RealParameter("factor_recovery", 0.38, 0.44),       #[tCO2/MWh]
-        RealParameter("factor_bark", 0.30, 0.34),
+        RealParameter("factor_recovery", 0.39, 0.42),       #[tCO2/MWh]
+        RealParameter("factor_bark", 0.30, 0.33),
         RealParameter("fluegas_intensity", 10000, 11000),   #[kg/t]
         RealParameter("COP", 2.3, 3.8),
         RealParameter("k", -32, -28),

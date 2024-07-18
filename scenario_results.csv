@@ -1,0 +1,20 @@
+--- Pulp sector ---
+At 70 000 scenarios of this satisficing level:
+y = (pulp_outcomes["capture_cost"] < 100) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 250)
+ 
+PRIM found:
+                    box 6 (79% density)
+                      min        max      qp value      qp value
+celc            20.004886  92.008207           NaN  2.851737e-08
+SupplyStrategy  {SteamLP}  {SteamLP}  0.000000e+00           NaN
+BarkIncrease           30         30  6.957545e-34  0.000000e+00
+
+
+PRIM found (@ZeroBiomass):
+                    box 4 (66% density)
+                      min        max qp value  qp value
+celc            20.004886  92.008207      NaN  0.210262
+beta             0.600031   0.690102      NaN  0.250686
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0       NaN
+
+

@@ -6,7 +6,7 @@ from matplotlib.patches import Ellipse
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
-def filter_dataframes(experiments_df, outcomes_df, conditions):
+def filter_dataframes(experiments_df, outcomes_df, conditions, categorical_conditions=None):
     """
     Filters the experiments and outcomes dataframes based on the specified conditions applied to the experiments dataframe.
 
@@ -15,10 +15,12 @@ def filter_dataframes(experiments_df, outcomes_df, conditions):
     outcomes_df (pd.DataFrame): The outcomes dataframe to be filtered.
     conditions (dict): A dictionary where keys are column names and values are tuples of the form (min_value, max_value).
                        Use None for no limit on min_value or max_value.
+    categorical_conditions (dict): A dictionary where keys are column names and values are lists of allowed categories.
 
     Returns:
     pd.DataFrame, pd.DataFrame: Two dataframes filtered based on the conditions - the experiments and outcomes dataframes.
     """
+    # Build the query string for numerical conditions
     query = []
     for column, (min_value, max_value) in conditions.items():
         if min_value is not None:
@@ -26,16 +28,24 @@ def filter_dataframes(experiments_df, outcomes_df, conditions):
         if max_value is not None:
             query.append(f"{column} <= {max_value}")
     
+    # Apply numerical conditions
     if query:
         query_string = " & ".join(query)
         filtered_experiments_df = experiments_df.query(query_string)
-        filtered_outcomes_df = outcomes_df.loc[filtered_experiments_df.index]
     else:
         filtered_experiments_df = experiments_df
-        filtered_outcomes_df = outcomes_df
+
+    # Apply categorical conditions
+    if categorical_conditions:
+        for column, allowed_values in categorical_conditions.items():
+            filtered_experiments_df = filtered_experiments_df[filtered_experiments_df[column].isin(allowed_values)]
+
+    # Filter outcomes dataframe based on the filtered experiments dataframe
+    filtered_outcomes_df = outcomes_df.loc[filtered_experiments_df.index]
     
     if filtered_experiments_df.empty:
         print("Filtered dataframe is empty")
+        
     return filtered_experiments_df, filtered_outcomes_df
 
 def plot_minmax_values(outcomes_df, KPI):
@@ -74,10 +84,14 @@ def plot_satisficing(outcomes_df, thresholds):
     filtered_df = outcomes_df[mask]
 
     # Apply the mask and group by 'Name' to count rows meeting all conditions
+    grouped_nominal_mean = outcomes_df.groupby('Name')['gross'].mean() #NOTE: this should maybe be calculated on the outcomes_df instead? Before masking.
     grouped = filtered_df.groupby('Name').size()
-    grouped_nominal_mean = filtered_df.groupby('Name')['gross'].mean()
-
     grouped_df = grouped.reset_index(name='Satisficing')
+
+    if "Aspa" in total['Name'].values and "Aspa" not in grouped_df['Name'].values: # Sometimes Aspa is not in grouped_df
+        new_row = pd.DataFrame({'Name': ['Aspa'], 'Satisficing': [0]})
+        grouped_df = pd.concat([grouped_df, new_row], ignore_index=True)
+
     satisficing_df = pd.merge(grouped_df, grouped_nominal_mean, on='Name', suffixes=('', '_mean'))
     satisficing_df.columns = ['Name', 'Satisficing', 'Gross CO2']
 
@@ -154,24 +168,39 @@ chp_outcomes = pd.read_csv("CHP experiments/all_outcomes.csv", delimiter=",", en
 pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
+# Apply the filter
+# boolean = (pulp_experiments["SupplyStrategy"] == "SteamLP") # NOTE: Using this temporarily to just select LP scenarios
+# pulp_experiments = pulp_experiments[boolean].reset_index(drop=True)
+# pulp_outcomes = pulp_outcomes[boolean].reset_index(drop=True)
+
+# zero_biomass_boolean = (pulp_experiments["BarkIncrease"] == 0)
+# pulp_experiments = pulp_experiments[zero_biomass_boolean].reset_index(drop=True)
+# pulp_outcomes = pulp_outcomes[zero_biomass_boolean].reset_index(drop=True)
+
 conditions = {
-    # 'BarkIncrease': (32, None),
-    # 'celc': (None, 60),
-    # Add more conditions as needed
+    # 'BarkIncrease': (None, 31),
+    # 'celc': (20, 92),
+    'COP': (3.22, 3.79),
+    # 'beta': (0.60, 0.69),
+    # 'rate': (0.79, 0.897)
 }
-# chp_experiments, chp_outcomes = filter_dataframes(chp_experiments, chp_outcomes, conditions)
-print(len(pulp_experiments), "scenarios are considered")
-pulp_experiments, pulp_outcomes = filter_dataframes(pulp_experiments, pulp_outcomes, conditions)
+categorical_conditions = {
+    "SupplyStrategy": ["HeatPumps"],
+    "BarkIncrease": [0]
+}
+pulp_experiments, pulp_outcomes = filter_dataframes(pulp_experiments, pulp_outcomes, conditions, categorical_conditions)
 print(len(pulp_experiments), "scenarios remain after filtering")
 
 # Plot explored KPIs
-plot_minmax_values(chp_outcomes, "capture_cost")
+plot_minmax_values(pulp_outcomes, "capture_cost")
+plot_minmax_values(pulp_outcomes, "penalty_services")
+plot_minmax_values(pulp_outcomes, "penalty_biomass")
 
 # Plot satisficing scenarios
 thresholds = {
     'capture_cost': 100,
-    'penalty_services': 500,
-    'penalty_biomass': 500
+    'penalty_services': 450,
+    'penalty_biomass': 250
 }
 
 satisficing_chp = plot_satisficing(chp_outcomes, thresholds)
