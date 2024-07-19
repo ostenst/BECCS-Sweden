@@ -88,9 +88,10 @@ def plot_satisficing(outcomes_df, thresholds):
     grouped = filtered_df.groupby('Name').size()
     grouped_df = grouped.reset_index(name='Satisficing')
 
-    if "Aspa" in total['Name'].values and "Aspa" not in grouped_df['Name'].values: # Sometimes Aspa is not in grouped_df
-        new_row = pd.DataFrame({'Name': ['Aspa'], 'Satisficing': [0]})
-        grouped_df = pd.concat([grouped_df, new_row], ignore_index=True)
+    for name in total['Name']: # Ensures that all plants in total are put in the grouped_df, but with 0 satisficing scenarios
+        if name not in grouped_df['Name'].values:
+            new_row = pd.DataFrame({'Name': [name], 'Satisficing': [0]})
+            grouped_df = pd.concat([grouped_df, new_row], ignore_index=True)
 
     satisficing_df = pd.merge(grouped_df, grouped_nominal_mean, on='Name', suffixes=('', '_mean'))
     satisficing_df.columns = ['Name', 'Satisficing', 'Gross CO2']
@@ -179,33 +180,35 @@ pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", 
 
 conditions = {
     # 'BarkIncrease': (None, 31),
-    # 'celc': (20, 92),
-    'COP': (3.22, 3.79),
+    # 'celc': (20, 72),
+    # 'COP': (3.22, 3.79),
     # 'beta': (0.60, 0.69),
-    # 'rate': (0.79, 0.897)
+    # 'rate': (0.795, 0.893),
+    # 'factor_recovery': (0.39, 0.40)
 }
 categorical_conditions = {
-    "SupplyStrategy": ["HeatPumps"],
-    "BarkIncrease": [0]
+    # "SupplyStrategy": ["SteamLP"],
+    # "BarkIncrease": [0]
 }
 pulp_experiments, pulp_outcomes = filter_dataframes(pulp_experiments, pulp_outcomes, conditions, categorical_conditions)
-print(len(pulp_experiments), "scenarios remain after filtering")
+chp_experiments, chp_outcomes = filter_dataframes(chp_experiments, chp_outcomes, conditions, categorical_conditions)
+print(len(chp_experiments), "scenarios remain after filtering")
 
 # Plot explored KPIs
-plot_minmax_values(pulp_outcomes, "capture_cost")
-plot_minmax_values(pulp_outcomes, "penalty_services")
-plot_minmax_values(pulp_outcomes, "penalty_biomass")
+plot_minmax_values(chp_outcomes, "capture_cost")
+plot_minmax_values(chp_outcomes, "penalty_services")
+plot_minmax_values(chp_outcomes, "penalty_biomass")
 
 # Plot satisficing scenarios
 thresholds = {
     'capture_cost': 100,
-    'penalty_services': 450,
-    'penalty_biomass': 250
+    'penalty_services': 200,
+    'penalty_biomass': 450
 }
 
 satisficing_chp = plot_satisficing(chp_outcomes, thresholds)
 satisficing_pulp = plot_satisficing(pulp_outcomes, thresholds)
-print(satisficing_pulp)
+print(satisficing_chp)
 
 satisficing_combined = pd.concat([satisficing_chp, satisficing_pulp]).drop_duplicates(subset='Name')
 coordinates_df = pd.read_csv('pulp_coordinates.csv')

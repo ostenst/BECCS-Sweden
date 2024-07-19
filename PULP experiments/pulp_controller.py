@@ -102,7 +102,7 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 250
+    n_scenarios = 350
     n_policies = 40
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
@@ -111,7 +111,6 @@ for index, plant_data in plants_df.iterrows():
     # ---------------------------------------- Process results  ---------------------------------------------
     df_experiments = pd.DataFrame(experiments)
     df_experiments["Name"] = pulp_plant.name
-    # df_experiments.to_csv("experiments.csv", index=False) 
     all_experiments = pd.concat([all_experiments, df_experiments], ignore_index=True)
 
     processed_outcomes = {} # Multi-dimensional outcomes need to be put into neat columns
@@ -122,10 +121,8 @@ for index, plant_data in plants_df.iterrows():
         else:
             processed_outcomes[k] = v
 
-    # df_outcomes = pd.DataFrame(outcomes)
     df_outcomes = pd.DataFrame(processed_outcomes)
     df_outcomes["Name"] = pulp_plant.name
-    # df_outcomes.to_csv("outcomes.csv", index=False)
     all_outcomes = pd.concat([all_outcomes, df_outcomes], ignore_index=True)
 
     # Sanity check to ensure the indices are aligned
@@ -138,32 +135,7 @@ for index, plant_data in plants_df.iterrows():
 
     df_outcomes["SupplyStrategy"] = experiments["SupplyStrategy"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-    sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=["capture_cost","penalty_services","penalty_biomass"])
-
-# # Launching PRIM algorithm
-# # zero_biomass_boolean = (df_experiments["BarkIncrease"] == "0")
-# # y = df_outcomes["capture_cost"]<70
-# # y = df_outcomes["penalty_services"]<300 
-# # y = df_outcomes["penalty_biomass"]==0 
-# # y = (df_outcomes["capture_cost"] < 90) & (df_outcomes["penalty_services"] < 600) & (df_outcomes["penalty_biomass"] < 220)
-# y = (all_outcomes["capture_cost"] < 100) & (all_outcomes["penalty_services"] < 500) 
-
-# x = all_experiments.iloc[:, 0:23]
-# print("The number of interesting cases are:\n", y.value_counts())
-
-# prim_alg = prim.Prim(x, y, threshold=0.8, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel)
-# box1 = prim_alg.find_box()
-
-# plt.clf()
-# box1.show_ppt()             # Lines tradeoff
-# box1.show_tradeoff()        # Pareto tradeoff 
-# box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
-
-# box1.select(6)
-# box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
-# prim_alg.show_boxes(6) 
-# prim_alg.boxes_to_dataframe() # Save boxes here?
-# box1.inspect(6)
+    # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=["capture_cost","penalty_services","penalty_biomass"])
 
 all_experiments.to_csv("all_experiments.csv", index=False)
 all_outcomes.to_csv("all_outcomes.csv", index=False)

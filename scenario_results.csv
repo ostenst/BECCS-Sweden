@@ -1,20 +1,27 @@
 --- Pulp sector ---
-At 70 000 scenarios of this satisficing level:
-y = (pulp_outcomes["capture_cost"] < 100) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 250)
+At this satisficing level:
+y = (pulp_outcomes["capture_cost"] < 85) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200) #BUT MAYBE KEEP BIOMASS HIGH ANYWAY?
  
 PRIM found:
-                    box 6 (79% density)
-                      min        max      qp value      qp value
-celc            20.004886  92.008207           NaN  2.851737e-08
-SupplyStrategy  {SteamLP}  {SteamLP}  0.000000e+00           NaN
-BarkIncrease           30         30  6.957545e-34  0.000000e+00
+                    box 8 (58% dense)
+                      min        max qp value       qp value
+BarkIncrease          0.0       30.0      NaN   0.000000e+00
+celc            20.019024  72.451906      NaN  1.008608e-111
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0            NaN
 
 
 PRIM found (@ZeroBiomass):
-                    box 4 (66% density)
-                      min        max qp value  qp value
-celc            20.004886  92.008207      NaN  0.210262
-beta             0.600031   0.690102      NaN  0.250686
-SupplyStrategy  {SteamLP}  {SteamLP}      0.0       NaN
+                     box 9 (62% dense)
+                       min        max qp value      qp value
+factor_recovery    0.39001   0.406121      NaN  2.707367e-37
+celc             20.019024  92.006106      NaN  1.206035e-07
+SupplyStrategy   {SteamLP}  {SteamLP}      0.0           NaN
 
 
+--- Reflection --- 
+The above sequence of scenarios works and I think it is adequate for a WHOLE POPULATION analysis. 
+  But if we do INDIVIDUAL analysis the satisficing level should be tightened! And we illustrate individual CONDITIONS per pulp plant!
+  The individual conditions MIGHT find 5st LP+elc and 2st HP+COP conditions - And overall higher densities!
+If using PRIM on whole population: LP+elc is a winnner in BALANCED and in ZEROBIOMASS
+  But Värö is weirdly bad. Especially in LP-ZEROBIOMASS. It has JUST too little steam: this is my claim! I launched PRIM on Värö in this scenario and found:
+    If we also restrict dimensions of rate/factor_recovery: then less CO2 exists and steam LP is viable for Värö again! <3

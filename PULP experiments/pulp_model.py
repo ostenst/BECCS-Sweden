@@ -214,7 +214,7 @@ class PulpPlant:
 
         # if self.name == "Varo" or self.name == "Monsteros" and self.technology_assumptions["bark_increase"]==0:
         #     # These have weirdly different P_lost values BUG: Is this a bug or working properly? Why are these two plants so different?
-        #     print("dP share:", dP_recovery/P_lost, P_lost, self.technology_assumptions["bark_increase"]) 
+        #     print("LP: dP share:", dP_recovery/P_lost, P_lost) 
 
     def recover_and_supplement(self):
         # Recover excess heat using pumps, supply residual demand with merit ordered steam
@@ -251,9 +251,9 @@ class PulpPlant:
         dP_bark = self.P_bark/(1+self.technology_assumptions["bark_increase"]) - P_bark*time
         P_lost = dP_recovery + dP_bark + self.results["W_captureplant"] + P_HP + remaining_demand       # Any remaining demand needs purchased grid electricity
 
-        # if self.name == "Varo" or self.name == "Monsteros":
+        # if self.name == "Varo" or self.name == "Monsteros" and self.technology_assumptions["bark_increase"]==0:
         #     # These have weirdly different P_lost values
-        #     print("dP share:", dP_recovery/P_lost, P_lost)
+        #     print("HP: dP share:", dP_recovery/P_lost, P_lost)
         
         self.results["P_lost"] = P_lost
         self.results["Q_60C"] = Q_60C
@@ -437,6 +437,10 @@ def CCS_Pulp(
     capture_cost = (aCAPEX + fixed_OPEX + energy_OPEX + other_OPEX) / (PulpPlant.gases["captured_emissions"]) #[kEUR/kt], ~half is energy opex
     penalty_services = PulpPlant.results["P_lost"]                  / (PulpPlant.gases["captured_emissions"]) #[MWh/kt]
     penalty_biomass  = PulpPlant.results["extra_biomass"]           / (PulpPlant.gases["captured_emissions"]) #[MWh/kt]
+
+    # if PulpPlant.name == "Varo" or PulpPlant.name == "Monsteros" and PulpPlant.technology_assumptions["bark_increase"]==0:
+    #     # These have weirdly different P_lost values BUG: Is this a bug or working properly? Why are these two plants so different?
+    #     print("P_lost/CO2:", PulpPlant.results["P_lost"] , (PulpPlant.gases["captured_emissions"]), penalty_services, "     ", SupplyStrategy) 
 
     PulpPlant.reset()
     return capture_cost, penalty_services, penalty_biomass, costs, emissions

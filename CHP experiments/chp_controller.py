@@ -39,7 +39,7 @@ for index, plant_data in plants_df.iterrows():
     print(f"||| MODELLING {plant_data['Plant Name']} BIOMASS CHP |||")
 
     energybalance_assumptions = {
-        "time": 5500,                    #[h/yr]
+        # "time": 5500,                    #[h/yr]
         "U": 1500                        #[W/m2K]
         # "m_fluegas": simplified from Tharun's study
         # "HEX costs": taken from Eliasson (2022)
@@ -104,8 +104,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 30
-    n_policies = 10
+    n_scenarios = 250
+    n_policies = 40
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results
@@ -141,6 +141,6 @@ for index, plant_data in plants_df.iterrows():
 
     df_outcomes["duration_increase"] = experiments["duration_increase"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-    # sns.pairplot(df_outcomes, hue="duration_increase", vars=["capture_cost","penalty_services","penalty_biomass"])
+#     sns.pairplot(df_outcomes, hue="duration_increase", vars=["capture_cost","penalty_services","penalty_biomass"])
 
 # plt.show()
