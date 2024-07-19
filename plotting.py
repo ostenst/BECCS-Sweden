@@ -132,6 +132,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     # Plot circles with varying diameter
     # norm = mcolors.Normalize(vmin=coordinates_gdf['Density'].min(), vmax=coordinates_gdf['Density'].max())
     cmap = plt.colormaps.get_cmap('coolwarm_r')
+    cmap = plt.colormaps.get_cmap('RdYlGn')
 
     for idx, row in coordinates_gdf.iterrows():
         radius_x = row['Gross CO2'] / 1100
@@ -142,12 +143,20 @@ def plot_densitymap(satisficing_df, coordinates_df):
         color = (*color[:3], 0.90) # Sets an alpha value
         edgecolor = color
 
+        if "City" in row.index:
+            Title = row["City"]
+        else:
+            Title = row["Name"]
+
         ellipse = Ellipse((row['Longitude'], row['Latitude']), width=radius_x * 2, height=radius_y * 2, edgecolor=edgecolor, facecolor=color, fill=True, linewidth=1.0)
         ax.add_patch(ellipse)
-        ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
-        ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
-        ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, row["Name"], fontsize=7, ha='left', va='center')
         
+        if row['Gross CO2'] > 300: #Only numbers above 300kt
+            ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
+            ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
+        if row['Gross CO2'] > 400: #Only name above 400kt
+            ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
+            
     sm = cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
     cbar = plt.colorbar(sm, ax=ax)
@@ -181,16 +190,19 @@ pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", 
 conditions = {
     # 'BarkIncrease': (None, 31),
     # 'celc': (20, 72),
-    # 'COP': (3.22, 3.79),
+    # 'cheat': (42, 150),
+    'COP': (3.22, 3.79),
     # 'beta': (0.60, 0.69),
-    # 'rate': (0.795, 0.893),
+    'rate': (0.78, 0.893),
     # 'factor_recovery': (0.39, 0.40)
 }
 categorical_conditions = {
     # "SupplyStrategy": ["SteamLP"],
     # "BarkIncrease": [0]
+    "heat_pump": [True],
+    "duration_increase": [0]
 }
-pulp_experiments, pulp_outcomes = filter_dataframes(pulp_experiments, pulp_outcomes, conditions, categorical_conditions)
+# pulp_experiments, pulp_outcomes = filter_dataframes(pulp_experiments, pulp_outcomes, conditions, categorical_conditions)
 chp_experiments, chp_outcomes = filter_dataframes(chp_experiments, chp_outcomes, conditions, categorical_conditions)
 print(len(chp_experiments), "scenarios remain after filtering")
 
@@ -202,8 +214,8 @@ plot_minmax_values(chp_outcomes, "penalty_biomass")
 # Plot satisficing scenarios
 thresholds = {
     'capture_cost': 100,
-    'penalty_services': 200,
-    'penalty_biomass': 450
+    'penalty_services': 400,
+    'penalty_biomass': 600
 }
 
 satisficing_chp = plot_satisficing(chp_outcomes, thresholds)
@@ -211,7 +223,7 @@ satisficing_pulp = plot_satisficing(pulp_outcomes, thresholds)
 print(satisficing_chp)
 
 satisficing_combined = pd.concat([satisficing_chp, satisficing_pulp]).drop_duplicates(subset='Name')
-coordinates_df = pd.read_csv('pulp_coordinates.csv')
+coordinates_df = pd.read_csv('chp_coordinates.csv')
 
 # Plot densities on Swedish map
 plot_densitymap(satisficing_combined, coordinates_df)

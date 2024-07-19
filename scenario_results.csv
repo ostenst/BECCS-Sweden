@@ -25,3 +25,13 @@ The above sequence of scenarios works and I think it is adequate for a WHOLE POP
 If using PRIM on whole population: LP+elc is a winnner in BALANCED and in ZEROBIOMASS
   But Värö is weirdly bad. Especially in LP-ZEROBIOMASS. It has JUST too little steam: this is my claim! I launched PRIM on Värö in this scenario and found:
     If we also restrict dimensions of rate/factor_recovery: then less CO2 exists and steam LP is viable for Värö again! <3
+
+
+--- CHP sector ---
+The satisficing level is perhaps another than pulp. I tried this:
+y = (chp_outcomes["capture_cost"] < 100) & (chp_outcomes["penalty_services"] < 200) & (chp_outcomes["penalty_biomass"] < 450)
+Which is easy with moderate increases in biomass. But without increases it is not possible/difficult to achieve low penalty_services!
+  @ZeroBiomass it is easier for smaller CHPs to recover heat and reduce the penalty. Probably an issue with the Aspen model.
+  ISSUE: I will not be able to show that large plants can more easily recover excess heat
+  ISSUE: in ZeroBiomass scenario it will look like small is better at converting energy! Wrong! So keep the acceptable cost low to circumvent the issue.
+  SOLUTION: I should ensure all CHPs can recover all waste heat

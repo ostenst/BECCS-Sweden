@@ -301,7 +301,9 @@ class CHP_plant:
             Qlow = Qpinch # Sometimes Qlow is poorly estimated, then just set the low grade heat to zero
         Qhex = (Qpinch-Qsupp) + (Qlow-Qpinch)
 
-        Qhp = composite_curve[-1][0] - Qlow
+        # Qhp = composite_curve[-1][0] - Qlow # BUG: This overestimates Qhp for smaller plants where the composite curve is less accurate
+        Qmax_beiron = self.get("Qreb")*1.18 # Assumptions from (Beiron, 2022)
+        Qhp = Qmax_beiron - Qlow
         if not self.technology_assumptions["heat_pump"]:
             Qhp = 0
         Php = Qhp/self.technology_assumptions["COP"]
