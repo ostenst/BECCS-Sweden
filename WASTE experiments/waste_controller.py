@@ -63,7 +63,7 @@ for index, plant_data in plants_df.iterrows():
     model.uncertainties = [
         RealParameter("dTreb", 7, 14),       #[tCO2/MWh]
         RealParameter("Tsupp", 78, 100),
-        RealParameter("Tlow", 43, 55),       #NOTE: Consider 35C as low (Ramboll, Malmö CCS study)
+        RealParameter("Tlow", 43, 55),       #[kg/t]
         RealParameter("COP", 2.3, 3.8),
         RealParameter("dTmin", 5, 12),
 

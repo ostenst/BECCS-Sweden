@@ -135,7 +135,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     cmap = plt.colormaps.get_cmap('RdYlGn')
 
     for idx, row in coordinates_gdf.iterrows():
-        radius_x = row['Gross CO2'] / 1100
+        radius_x = row['Gross CO2'] / 600
         radius_y = radius_x / 2.1     # Hard coding this seems to work...
 
         color = cmap(row['Density'])
@@ -151,10 +151,10 @@ def plot_densitymap(satisficing_df, coordinates_df):
         ellipse = Ellipse((row['Longitude'], row['Latitude']), width=radius_x * 2, height=radius_y * 2, edgecolor=edgecolor, facecolor=color, fill=True, linewidth=1.0)
         ax.add_patch(ellipse)
         
-        if row['Gross CO2'] > 300: #Only numbers above 300kt
+        if row['Gross CO2'] > 220: #Only numbers above 300kt
             ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
             ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
-        if row['Gross CO2'] > 400: #Only name above 400kt
+        if row['Gross CO2'] > 900: #Only name above 400kt
             ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
             
     sm = cm.ScalarMappable(cmap=cmap)
@@ -189,12 +189,14 @@ pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", 
 
 conditions = {
     # 'BarkIncrease': (None, 31),
-    # 'celc': (20, 72),
+    'celc': (20, 92),
     # 'cheat': (42, 150),
-    'COP': (3.22, 3.79),
+    'COP': (2.93, 3.80),
     # 'beta': (0.60, 0.69),
-    'rate': (0.78, 0.893),
-    # 'factor_recovery': (0.39, 0.40)
+    # 'rate': (0.78, 0.893),
+    # 'factor_recovery': (0.39, 0.40),
+    # 'time': (5160, 5997),
+    # "duration_increase": (None, 1001)
 }
 categorical_conditions = {
     # "SupplyStrategy": ["SteamLP"],
@@ -214,8 +216,8 @@ plot_minmax_values(chp_outcomes, "penalty_biomass")
 # Plot satisficing scenarios
 thresholds = {
     'capture_cost': 100,
-    'penalty_services': 400,
-    'penalty_biomass': 600
+    'penalty_services': 350,
+    'penalty_biomass': 450
 }
 
 satisficing_chp = plot_satisficing(chp_outcomes, thresholds)

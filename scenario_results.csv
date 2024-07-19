@@ -1,3 +1,6 @@
+/// ALL SECTORS ///
+Difficult to set thresholds. At ZeroBiomass we most likely need around 200-400 MWh/kt (i.e. 1 GJ/t) of penalty_services no matter what!
+
 --- Pulp sector ---
 At this satisficing level:
 y = (pulp_outcomes["capture_cost"] < 85) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200) #BUT MAYBE KEEP BIOMASS HIGH ANYWAY?
@@ -29,9 +32,27 @@ If using PRIM on whole population: LP+elc is a winnner in BALANCED and in ZEROBI
 
 --- CHP sector ---
 The satisficing level is perhaps another than pulp. I tried this:
-y = (chp_outcomes["capture_cost"] < 100) & (chp_outcomes["penalty_services"] < 200) & (chp_outcomes["penalty_biomass"] < 450)
+OUTDATED y = (chp_outcomes["capture_cost"] < 100) & (chp_outcomes["penalty_services"] < 200) & (chp_outcomes["penalty_biomass"] < 450)
 Which is easy with moderate increases in biomass. But without increases it is not possible/difficult to achieve low penalty_services!
   @ZeroBiomass it is easier for smaller CHPs to recover heat and reduce the penalty. Probably an issue with the Aspen model.
   ISSUE: I will not be able to show that large plants can more easily recover excess heat
   ISSUE: in ZeroBiomass scenario it will look like small is better at converting energy! Wrong! So keep the acceptable cost low to circumvent the issue.
-  SOLUTION: I should ensure all CHPs can recover all waste heat
+  SOLUTION: I should ensure all CHPs can recover all waste heat - DONE :)
+
+At this satisficing level:
+y = (chp_outcomes["capture_cost"] < 100) & (chp_outcomes["penalty_services"] < 350) & (chp_outcomes["penalty_biomass"] < 450)
+ 
+PRIM found:
+                       box 10 (58% dense @VÄRTAVERKET others perform to bad so I should divide the analysis between plant sizes)
+                          min          max      qp value      qp value
+duration_increase         0.0       1000.0           NaN  2.397119e-52
+heat_pump              {True}       {True}  1.655178e-97           NaN
+time               5160.46861  5996.708382  1.283369e-85           NaN
+
+
+PRIM found (@ZeroBiomass):
+               box 7 (60% dense VÄRTAVERKET)
+                 min        max       qp value  qp value
+celc       20.112614  92.238603            NaN  0.015936
+heat_pump     {True}     {True}  1.264542e-102       NaN
+COP         2.930146    3.79528   3.299424e-30       NaN
