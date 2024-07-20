@@ -294,7 +294,7 @@ class W2E_plant:
             else:
                 return x1 + (x2 - x1) * (ynew - y1) / (y2 - y1)
         
-        Qsupp = linear_interpolation(curve, Tsupp)
+        Qsupp = linear_interpolation(curve, 86) # BUG: Hard-coded Tsupp=86C since higher temp. heat won't be available
         Qlow = linear_interpolation(curve, Tlow)
         Qpinch, Tpinch = curve[max_curvature_index][0], curve[max_curvature_index][1]
         if Qlow < Qpinch:
@@ -315,7 +315,7 @@ class W2E_plant:
         self.results["Qrecovered"] = (Qhex + Qhp)/1000
         self.results["Qhp"] = Qhp/1000
         self.QTdict = {
-            "supp": [Qsupp, Tsupp],
+            "supp": [Qsupp, 86], # BUG: Also hard-coded
             "low": [Qlow, Tlow],
             "pinch": [Qpinch, Tpinch]
         }

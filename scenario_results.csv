@@ -56,3 +56,11 @@ PRIM found (@ZeroBiomass):
 celc       20.112614  92.238603            NaN  0.015936
 heat_pump     {True}     {True}  1.264542e-102       NaN
 COP         2.930146    3.79528   3.299424e-30       NaN
+
+
+--- W2E sector ---
+              box 7
+                min       max qp value      qp value
+i           0.05001   0.10406      NaN  2.247014e-17
+COP        2.913555  3.799993      0.0           NaN
+heat_pump    {True}    {True}      0.0           NaN

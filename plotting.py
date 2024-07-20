@@ -175,6 +175,9 @@ def plot_densitymap(satisficing_df, coordinates_df):
 chp_experiments = pd.read_csv("CHP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 chp_outcomes = pd.read_csv("CHP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
+w2e_experiments = pd.read_csv("WASTE experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
+w2e_outcomes = pd.read_csv("WASTE experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
+
 pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
@@ -189,12 +192,12 @@ pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", 
 
 conditions = {
     # 'BarkIncrease': (None, 31),
-    'celc': (20, 92),
+    # 'celc': (20, 92),
     # 'cheat': (42, 150),
-    'COP': (2.93, 3.80),
-    # 'beta': (0.60, 0.69),
+    'COP': (2.9, 3.80),
+    # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    # 'factor_recovery': (0.39, 0.40),
+    'i': (0.05, 0.10),
     # 'time': (5160, 5997),
     # "duration_increase": (None, 1001)
 }
@@ -202,30 +205,32 @@ categorical_conditions = {
     # "SupplyStrategy": ["SteamLP"],
     # "BarkIncrease": [0]
     "heat_pump": [True],
-    "duration_increase": [0]
+    # "duration_increase": [0]
 }
+# chp_experiments, chp_outcomes = filter_dataframes(chp_experiments, chp_outcomes, conditions, categorical_conditions)
+w2e_experiments, w2e_outcomes = filter_dataframes(w2e_experiments, w2e_outcomes, conditions, categorical_conditions)
 # pulp_experiments, pulp_outcomes = filter_dataframes(pulp_experiments, pulp_outcomes, conditions, categorical_conditions)
-chp_experiments, chp_outcomes = filter_dataframes(chp_experiments, chp_outcomes, conditions, categorical_conditions)
-print(len(chp_experiments), "scenarios remain after filtering")
+print(len(w2e_experiments), "scenarios remain after filtering")
 
 # Plot explored KPIs
-plot_minmax_values(chp_outcomes, "capture_cost")
-plot_minmax_values(chp_outcomes, "penalty_services")
-plot_minmax_values(chp_outcomes, "penalty_biomass")
+plot_minmax_values(w2e_outcomes, "capture_cost")
+plot_minmax_values(w2e_outcomes, "penalty_services")
+plot_minmax_values(w2e_outcomes, "penalty_biomass")
 
 # Plot satisficing scenarios
 thresholds = {
     'capture_cost': 100,
-    'penalty_services': 350,
-    'penalty_biomass': 450
+    'penalty_services': 300,
+    'penalty_biomass': 1
 }
 
-satisficing_chp = plot_satisficing(chp_outcomes, thresholds)
+# satisficing_chp = plot_satisficing(chp_outcomes, thresholds)
+satisficing_w2e = plot_satisficing(w2e_outcomes, thresholds)
 satisficing_pulp = plot_satisficing(pulp_outcomes, thresholds)
-print(satisficing_chp)
+print(satisficing_w2e)
 
-satisficing_combined = pd.concat([satisficing_chp, satisficing_pulp]).drop_duplicates(subset='Name')
-coordinates_df = pd.read_csv('chp_coordinates.csv')
+satisficing_combined = pd.concat([satisficing_w2e, satisficing_pulp]).drop_duplicates(subset='Name')
+coordinates_df = pd.read_csv('w2e_coordinates.csv')
 
 # Plot densities on Swedish map
 plot_densitymap(satisficing_combined, coordinates_df)

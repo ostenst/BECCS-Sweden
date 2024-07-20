@@ -25,7 +25,7 @@ from ema_workbench.analysis import prim
 # from prim_constrained import *
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
-plants_df = pd.read_csv("WASTE data.csv",delimiter=";")
+plants_df = pd.read_csv("WASTE data all.csv",delimiter=";")
 # plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
 all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
@@ -84,7 +84,7 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("cHP", 0.76, 0.96),
         RealParameter("cHEX", 0.500, 0.600),  
 
-        RealParameter("time", 4000, 6000),
+        RealParameter("time", 7800, 8200),
     ]
     model.levers = [
         # CategoricalParameter("duration_increase", ["0", "1000","2000"]),
@@ -104,8 +104,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 30
-    n_policies = 10
+    n_scenarios = 200
+    n_policies = 15
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results
@@ -141,6 +141,6 @@ for index, plant_data in plants_df.iterrows():
 
     df_outcomes["heat_pump"] = experiments["heat_pump"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-    sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
+    # sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
 
-plt.show()
+# plt.show()
