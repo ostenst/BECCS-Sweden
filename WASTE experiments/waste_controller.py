@@ -5,7 +5,7 @@ import numpy as np
 # from scipy.optimize import brentq
 # from scipy.interpolate import LinearNDInterpolator
 # from ema_workbench.em_framework.evaluators import Samplers
-from chp_model import *
+from waste_model import *
 import matplotlib.pyplot as plt  
 import seaborn as sns
 import pandas as pd
@@ -25,7 +25,7 @@ from ema_workbench.analysis import prim
 # from prim_constrained import *
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
-plants_df = pd.read_csv("CHP data all.csv",delimiter=";")
+plants_df = pd.read_csv("WASTE data.csv",delimiter=";")
 # plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
 all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
@@ -36,7 +36,7 @@ aspen_interpolators = create_interpolators(aspen_df)
 
 for index, plant_data in plants_df.iterrows():
 
-    print(f"||| MODELLING {plant_data['Plant Name']} BIOMASS CHP |||")
+    print(f"||| MODELLING {plant_data['Plant Name']} WASTE CHP |||")
 
     energybalance_assumptions = {
         # "time": 5500,                    #[h/yr]
@@ -45,7 +45,7 @@ for index, plant_data in plants_df.iterrows():
         # "HEX costs": taken from Eliasson (2022)
     }
 
-    CHP = CHP_plant(
+    CHP = W2E_plant(
         name=plant_data["Plant Name"],
         fuel=plant_data["Fuel (W=waste, B=biomass)"],
         Qdh=plant_data["Heat output (MWheat)"],
@@ -87,7 +87,7 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("time", 4000, 6000),
     ]
     model.levers = [
-        CategoricalParameter("duration_increase", ["0", "1000","2000"]),
+        # CategoricalParameter("duration_increase", ["0", "1000","2000"]),
         RealParameter("rate", 0.78, 0.94),
         CategoricalParameter("heat_pump", [True, False]),
     ]
@@ -104,8 +104,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 250
-    n_policies = 40
+    n_scenarios = 30
+    n_policies = 10
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results
@@ -139,8 +139,8 @@ for index, plant_data in plants_df.iterrows():
     else:
         print("Mismatch in the number of rows between df_experiments and df_outcomes.")
 
-    df_outcomes["duration_increase"] = experiments["duration_increase"]
+    df_outcomes["heat_pump"] = experiments["heat_pump"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-#     sns.pairplot(df_outcomes, hue="duration_increase", vars=["capture_cost","penalty_services","penalty_biomass"])
+    sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
 
-# plt.show()
+plt.show()

@@ -51,7 +51,7 @@ def create_interpolators(aspen_df):
 
     return aspen_interpolators
 
-class CHP_plant:
+class W2E_plant:
     def __init__(self, name, fuel, Qdh, P, Qfgc, ybirth, Tsteam, psteam, energybalance_assumptions):
         self.name = name
         self.fuel = fuel
@@ -447,14 +447,14 @@ def CCS_CHP(
     t=25,
     celc=40,
     cheat=40,
-    cbio=30,
+    cbio=99999999,
     cMEA=2,
     cHP=0.86,                       #(Bergander & Hellander, 2024)
     cHEX=0.571,                     # check units in (Eliasson, 2022)
     
-    time=5000,
+    time=8000,
 
-    duration_increase="1000",       #[h/yr]
+    # duration_increase="1000",       #[h/yr]
     # HEX_optimization="100",         #[% of optimal] everybody optimizes this, no reason to include!
     rate=0.90,
     heat_pump=True,
@@ -465,7 +465,7 @@ def CCS_CHP(
     technology_assumptions = {
         'U': CHP.energybalance_assumptions["U"],
         "time": time,
-        "duration_increase": int(duration_increase),
+        "duration_increase": 0,         # This is the main difference compared to wood chip fired CHP
         # "HEX_optimization": int(HEX_optimization),
         "rate": rate,
         "heat_pump": heat_pump,
@@ -475,7 +475,7 @@ def CCS_CHP(
         "Tlow": Tlow,
         "dTmin": dTmin,
         "COP": COP,
-        "molar_mass": 30.17
+        "molar_mass": 29.55
     }
 
     economic_assumptions = {
@@ -543,7 +543,7 @@ def CCS_CHP(
 if __name__ == "__main__":
 
     # Load plant data
-    plants_df = pd.read_csv("CHP data.csv",delimiter=";")
+    plants_df = pd.read_csv("WASTE data.csv",delimiter=";")
     plant_data = plants_df.iloc[0]
 
     # Load CHP Aspen data
@@ -558,7 +558,7 @@ if __name__ == "__main__":
         # "HEX costs": taken from Eliasson (2022)
     }
 
-    CHP = CHP_plant(
+    CHP = W2E_plant(
         name=plant_data["Plant Name"],
         fuel=plant_data["Fuel (W=waste, B=biomass)"],
         Qdh=plant_data["Heat output (MWheat)"],
@@ -569,7 +569,7 @@ if __name__ == "__main__":
         psteam=plant_data["Live steam pressure (bar)"],
         energybalance_assumptions=energybalance_assumptions
     )
-    print(f"||| MODELLING {CHP.name} BIOMASS CHP |||")
+    print(f"||| MODELLING {CHP.name} WASTE CHP |||")
 
     CHP.estimate_nominal_cycle() 
     CHP.print_energybalance()
