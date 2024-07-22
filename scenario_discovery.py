@@ -6,37 +6,35 @@ import matplotlib.pyplot as plt
 chp_experiments = pd.read_csv("CHP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 chp_outcomes = pd.read_csv("CHP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
-# chp_experiments = pd.read_csv("WASTE experiments/all_experiments.csv",delimiter=",", encoding='utf-8')  #NOTE: SELECT WASTE OR CHP?
-# chp_outcomes = pd.read_csv("WASTE experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
+chp_experiments = pd.read_csv("WASTE experiments/all_experiments.csv",delimiter=",", encoding='utf-8')  #NOTE: SELECT WASTE OR CHP?
+chp_outcomes = pd.read_csv("WASTE experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
 pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
 # If you want a specific plant
-# pulp_experiments = pulp_experiments[ (pulp_experiments["Name"] == "Varo") ].reset_index(drop=True)
-# pulp_outcomes = pulp_outcomes[ (pulp_outcomes["Name"] == "Varo") ].reset_index(drop=True)
+pulp_experiments = pulp_experiments[ (pulp_experiments["Name"] == "Varo") ].reset_index(drop=True)
+pulp_outcomes = pulp_outcomes[ (pulp_outcomes["Name"] == "Varo") ].reset_index(drop=True)
 # chp_experiments = chp_experiments[ (chp_experiments["Name"] == "Vartaverket KVV 8 ") ].reset_index(drop=True)
 # chp_outcomes = chp_outcomes[ (chp_outcomes["Name"] == "Vartaverket KVV 8 ") ].reset_index(drop=True)
 
-# If you want only zero biomass scenarios
-# # zero_biomass_boolean = (pulp_experiments["BarkIncrease"] == 0)
-zero_biomass_boolean = (chp_experiments["duration_increase"] == 0)
-# # zero_biomass_boolean = (pulp_experiments["SupplyStrategy"] == "SteamLP") & (pulp_experiments["BarkIncrease"] == 0)
-if True:
-    chp_experiments = chp_experiments[zero_biomass_boolean].reset_index(drop=True)
-    chp_outcomes = chp_outcomes[zero_biomass_boolean].reset_index(drop=True)
+# # If you want only zero biomass scenarios
+# zero_biomass_boolean = (pulp_experiments["BarkIncrease"] == 0)
+# if True:
+#     pulp_experiments = pulp_experiments[zero_biomass_boolean].reset_index(drop=True)
+#     pulp_outcomes = pulp_outcomes[zero_biomass_boolean].reset_index(drop=True)
 
-#Figure out what plants have above 300 kt/yr
-grouped = chp_outcomes.groupby('Name')
-gross_means = grouped['gross'].mean().sort_values()
-high_gross_names = gross_means[(gross_means > 300)].index.tolist()
-boolean = chp_outcomes['Name'].isin(high_gross_names)
-filtered_outcomes = chp_outcomes[boolean].reset_index(drop=True)
-filtered_experiments = chp_experiments[boolean].reset_index(drop=True)
+# #Figure out what plants have above 300 kt/yr
+# grouped = chp_outcomes.groupby('Name')
+# gross_means = grouped['gross'].mean().sort_values()
+# high_gross_names = gross_means[(gross_means < 150)].index.tolist()
+# boolean = chp_outcomes['Name'].isin(high_gross_names)
+# filtered_outcomes = chp_outcomes[boolean].reset_index(drop=True)
+# filtered_experiments = chp_experiments[boolean].reset_index(drop=True)
 
 # Define X and Y
-x = filtered_experiments.iloc[:, 0:26]
-y = (filtered_outcomes["capture_cost"] < 100) & (filtered_outcomes["penalty_services"] < 200) & (filtered_outcomes["penalty_biomass"] < 500)
+x = pulp_experiments.iloc[:, 0:24]
+y = (pulp_outcomes["capture_cost"] < 80) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200)
 print(y.sum(),"scenarios are satisficing out of", len(y))
 
 

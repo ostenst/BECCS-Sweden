@@ -152,15 +152,13 @@ def plot_densitymap(satisficing_df, coordinates_df):
         ellipse = Ellipse((row['Longitude'], row['Latitude']), width=radius_x * 2, height=radius_y * 2, edgecolor=edgecolor, facecolor=color, fill=True, linewidth=1.0)
         ax.add_patch(ellipse)
 
-        random.seed(7)
-        random_offset = random.uniform(-0.3, 0.3)
         if row['Gross CO2'] > 250: #Only [%] above 
             ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
-        if row['Gross CO2'] > 450: #Only [kt] above
-            ax.text(row['Longitude']+radius_x, row['Latitude']+random_offset, f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
+        if row['Gross CO2'] > 330: #Only [kt] above
+            ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
         if row['Gross CO2'] > 450: #Only name above
-            # add random offset to the vertical position
-            ax.text(row['Longitude']+radius_x, row['Latitude']+random_offset+0.2, Title, fontsize=7, ha='left', va='center')
+            # move this text 
+            ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
             
     sm = cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
@@ -199,6 +197,9 @@ w2e_experiments = pd.read_csv("WASTE experiments/all_experiments.csv",delimiter=
 w2e_outcomes = pd.read_csv("WASTE experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 w2e_coordinates = pd.read_csv('w2e_coordinates.csv')
 
+chp_outcomes = w2e_outcomes #overwrite just for lazy plotting
+chp_experiments = w2e_experiments
+
 pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 pulp_coordinates = pd.read_csv('pulp_coordinates.csv')
@@ -220,21 +221,21 @@ categorical_restrictions = {
     # "heat_pump": [True],
     # "duration_increase": [1000]
 }
-satisficing_thresholds_1 = {
-    'capture_cost': 100,
-    'penalty_services': 300, #NOTE: do you want this or not? YES I SHOULD REDO EVERYTHING FOR 100,300,500 (maybe 400?)
-    'penalty_biomass': 500
-}
+# satisficing_thresholds_1 = {
+#     'capture_cost': 100,
+#     'penalty_services': 300,
+#     'penalty_biomass': 500
+# }
 satisficing_thresholds_2 = {
     'capture_cost': 100,
-    'penalty_services': 350,
+    'penalty_services': 300,
     'penalty_biomass': 1
 }
-satisficing_thresholds_3 = {
-    'capture_cost': 80,
-    'penalty_services': 500,
-    'penalty_biomass': 200
-}
+# satisficing_thresholds_3 = {
+#     'capture_cost': 80,
+#     'penalty_services': 500,
+#     'penalty_biomass': 200
+# }
 
 # BELOW IS MADNESS; BUT IT WORKED
 
@@ -242,60 +243,60 @@ satisficing_thresholds_3 = {
 grouped = chp_outcomes.groupby('Name')
 gross_means = grouped['gross'].mean().sort_values()
 
-high_gross_names = gross_means[(gross_means > 300)].index.tolist()
+high_gross_names = gross_means[(gross_means > 350)].index.tolist()
 boolean = chp_outcomes['Name'].isin(high_gross_names)
 filtered_outcomes_high = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_high = chp_experiments[boolean].reset_index(drop=True)
 
-mid_gross_names = gross_means[(gross_means > 200) & (gross_means < 300)].index.tolist()
+mid_gross_names = gross_means[(gross_means > 150) & (gross_means < 350)].index.tolist()
 boolean = chp_outcomes['Name'].isin(mid_gross_names)
 filtered_outcomes_mid = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_mid = chp_experiments[boolean].reset_index(drop=True)
 
-low_gross_names = gross_means[(gross_means < 200)].index.tolist()
+low_gross_names = gross_means[(gross_means < 150)].index.tolist()
 boolean = chp_outcomes['Name'].isin(low_gross_names)
 filtered_outcomes_low = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 
-# plot_everything(filtered_experiments, filtered_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
+# # plot_everything(filtered_experiments, filtered_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
 # plot_everything(chp_experiments, chp_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
 # plot_everything(w2e_experiments, w2e_outcomes, w2e_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_2)
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
-    # 'COP': (3.15, 3.80),
-    # 'Tlow': (43, 50.7),
-    # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.10),
-    # 'time': (4822, 5999),
+    'COP': (3.28, 3.80),
+    'celc': (20, 90),
+    # # 'rate': (0.78, 0.893),
+    # # 'i': (0.05, 0.10),
+    # 'time': (4400, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
-    # "heat_pump": [True],
+    "heat_pump": [True],
     # "duration_increase": [0]
 }
 numerical_restrictions_2 = {
-    # 'COP': (3.2, 3.80),
-    # 'Tsupp': (83, 100),
+    'COP': (3, 3.80),
+    'celc': (20, 85),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.10),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
-    # "heat_pump": [True],
+    "heat_pump": [True],
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    # 'COP': (2.7, 3.80),
+    'COP': (2.6, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.10),
+    'i': (0.05, 0.10),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
-    # "heat_pump": [True],
+    "heat_pump": [True],
     # "duration_increase": [0]
 }
 
@@ -307,9 +308,10 @@ satisficing_combined = pd.DataFrame()
 for subset in subsets:
     experiments, outcomes = filter_dataframes(subset[0], subset[1], subset[2], subset[3])
     print(len(experiments), "scenarios remain after restricting dimensions")
-    satisficing_df = plot_satisficing(outcomes, satisficing_thresholds_1)
+    satisficing_df = plot_satisficing(outcomes, satisficing_thresholds_2)
     satisficing_combined = pd.concat([satisficing_combined, satisficing_df]).drop_duplicates(subset='Name')
 
-plot_densitymap(satisficing_combined, chp_coordinates)
+plot_densitymap(satisficing_combined, w2e_coordinates)
+
 
 plt.show()

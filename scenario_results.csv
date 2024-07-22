@@ -10,53 +10,160 @@ If using PRIM on whole population: LP+elc is a winnner in BALANCED and in ZEROBI
   But Värö is weirdly bad. Especially in LP-ZEROBIOMASS. It has JUST too little steam: this is my claim! I launched PRIM on Värö in this scenario and found:
     If we also restrict dimensions of rate/factor_recovery: then less CO2 exists and steam LP is viable for Värö again! <3
 
+--- PULP sector ---
+y = (pulp_outcomes["capture_cost"] < 80) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200)
+
+ÖSTRAND
+                    box 9 (97%)
+                      min        max qp value      qp value
+BarkIncrease          0.0        0.0      NaN  0.000000e+00
+celc            20.134869  72.324771      NaN  5.392947e-55
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
+                    box 8 (99%)
+                      min        max qp value      qp value
+celc            20.134869  72.324771      NaN  5.206515e-47
+CEPCI            1.000154   1.162032      NaN  2.215891e-04
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
+
+        VALLVIK
+                            box 5 (36%)
+                              min        max       qp value       qp value
+        BarkIncrease          0.0       30.0            NaN  4.800821e-203
+        celc            20.144549  91.999311            NaN   6.934749e-07
+        SupplyStrategy  {SteamLP}  {SteamLP}  3.330831e-298            Na
+                          box 10 (77%)
+                              min        max       qp value      qp value
+        celc            20.144549  61.425989            NaN  9.330750e-99
+        beta             0.600046   0.679389            NaN  2.938561e-17
+        SupplyStrategy  {SteamLP}  {SteamLP}  4.554711e-194           NaN
+
+SKUTSKÄR
+                    box 7 (91%)
+                      min        max qp value      qp value
+BarkIncrease          0.0        0.0      NaN  0.000000e+00
+celc            20.037917  84.793356      NaN  2.531444e-18
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
+                    box 6 (96%)
+                      min        max qp value      qp value
+celc            20.037917  84.793356      NaN  1.213646e-21
+beta             0.600193   0.682257      NaN  8.553523e-10
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
+
+        ASPA
+                            box 12 (48%)
+                                min          max       qp value       qp value
+        celc                20.1542    63.865901            NaN  1.589075e-131
+        SupplyStrategy  {HeatPumps}  {HeatPumps}   0.000000e+00            NaN
+        COP                2.830686     3.797916  7.842542e-103            NaN
+                            box 12 (41%)
+                                min          max      qp value      qp value
+        celc                20.1542    63.668184           NaN  3.927339e-36
+        SupplyStrategy  {HeatPumps}  {HeatPumps}  2.824530e-78           NaN
+        COP                2.827737     3.797916  2.869435e-26           NaN
+
+VARÖ
+                               box 3 (20%)
+                                 min                   max      qp value      qp value
+BarkIncrease                     0.0                  60.0           NaN  6.142768e-55
+SupplyStrategy  {SteamLP, HeatPumps}  {SteamLP, HeatPumps}  2.628613e-96           NaN
+rate                        0.800356              0.939259  1.432273e-09           NaN
+                     box 13 (62%), cheating with 4 dimensions :)
+                        min          max      qp value      qp value
+celc              20.014078    84.841502           NaN  1.862263e-11
+rate               0.807321     0.911032           NaN  5.144410e-01 ///CONSIDER REMOVING THIS, FOR 3 DIMENSIONS
+COP                3.080874      3.79726  8.329893e-99           NaN
+SupplyStrategy  {HeatPumps}  {HeatPumps}  2.544718e-34           NaN
+
+        MÖNSTERÅS
+                            box 9 (80%)
+                              min        max qp value      qp value
+        BarkIncrease          0.0       30.0      NaN  0.000000e+00
+        celc            20.130187  67.049844      NaN  2.123417e-74
+        SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
+                            box 4 (80%)
+                              min        max qp value      qp value
+        rate             0.820186   0.923483      NaN  1.301156e-11
+        celc            20.130187  92.012567      NaN  5.796936e-05
+        SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
+
+MORRUM
+                    box 8 (65%)
+                      min        max qp value       qp value
+BarkIncrease          0.0       30.0      NaN  2.727395e-274
+celc            20.145626  72.337647      NaN   4.655815e-82
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0            NaN
+                    box 6 (82%)
+                      min        max       qp value      qp value
+celc            20.145626   78.25428            NaN  7.759164e-37
+rate             0.787648   0.912174            NaN  1.979363e-27
+SupplyStrategy  {SteamLP}  {SteamLP}  3.380930e-256           NaN
+
+
+
+--- WASTE sector ---
+    Scenarios (>350kt plants):
+                  box 12 (96%)
+                    min        max qp value      qp value
+    celc       20.129509  90.785432      NaN  1.886051e-11
+    COP         3.278912   3.799198      0.0           NaN
+    heat_pump     {True}     {True}      0.0           NaN
+
+    Scenarios (150-350kt plants):
+                box 10 (78%)
+                    min        max qp value      qp value
+    celc       20.05965  84.941832      NaN  2.615170e-82
+    COP        3.085026   3.799662      0.0           NaN
+    heat_pump    {True}     {True}      0.0           NaN
+
+    Scenarios (<150kt plants):
+                  box 5 (35%)
+                    min       max       qp value       qp value
+    i          0.050003  0.098581            NaN  2.025307e-108
+    heat_pump    {True}    {True}   0.000000e+00            NaN
+    COP        2.585735  3.799927  3.245512e-145            NaN
 
 --- CHP sector ---
 The jump between map1 and map2 is great! But the ZeroBiomass conditions are just unreliable.
-A solution is to SEARCH for slightly easier thresholds to ensure PRIM works. But then still illustrate the tight thresholds in results! Will try this:
-y = (filtered_outcomes["capture_cost"] < 150) & (filtered_outcomes["penalty_services"] < 300) & (filtered_outcomes["penalty_biomass"] < 500)
-
-IMPORTANT: Using ["penalty_services"] < 200 works, but makes the biomass scenario terrible. So then map1 and map3 will be red, while map2 will be green.
-Given this, I should probably redo this analysis but for < 300. This gives interesting result that Tlow matters, and map1 is red map2 is green map3 is orange.
+A solution is to SEARCH for slightly easier thresholds to ensure PRIM works. But then still illustrate the tight thresholds in results!
 
 Thresholds:
-y = (filtered_outcomes["capture_cost"] < 100) & (filtered_outcomes["penalty_services"] < 200) & (filtered_outcomes["penalty_biomass"] < 500)
+y = (filtered_outcomes["capture_cost"] < 100) & (filtered_outcomes["penalty_services"] < 300) & (filtered_outcomes["penalty_biomass"] < 500)
 
 Scenarios (>300kt plants):
-                            box 8 (86%dens)
+                            box 8 (86%)
                               min          max qp value qp value
     time               4822.332392  5999.325117      0.0      NaN
     heat_pump               {True}       {True}      0.0      NaN
     duration_increase         1000         1000      0.0      0.0
 
-                  box 13 (83%dens @easy cost<150 and ES<300)
-                    min        max       qp value      qp value
-    Tlow       43.010662  50.754191            NaN  7.793870e-28
-    heat_pump     {True}     {True}   0.000000e+00           NaN
-    COP         3.156986   3.796595  1.446576e-180           NaN
+                    box 9 (40%)
+                      min          max       qp value qp value
+    heat_pump       {True}       {True}  1.939974e-157      NaN
+    COP           3.001566     3.796595   4.447933e-71      NaN
+    time       4387.595319  5999.325117   2.601100e-09      NaN
 
 Scenarios (200-300kt plants):
-                         box 8 (79%dens)
+                            box 8 (79%)
                               min          max qp value qp value
     time               4821.350064  5999.467367      0.0      NaN
     heat_pump               {True}       {True}      0.0      NaN
     duration_increase         1000         1000      0.0      0.0
 
-                box 12 (81%dens @easy cost<150 and ES<300)
-                    min       max qp value      qp value
-    i          0.050017  0.097682      NaN  1.851772e-15
-    COP        3.222013  3.799497      0.0           NaN
-    heat_pump    {True}    {True}      0.0           NaN
+                    box 3 (17%)
+                      min          max       qp value qp value
+    heat_pump       {True}       {True}  2.716963e-206      NaN
+    COP           2.450439     3.799497   1.358425e-06      NaN
+    time       4199.056399  5999.467367   4.998829e-06      NaN
 
 Scenarios (<200kt plants):
-                            box 7 (72%dens @easier cost<150)
-                              min          max qp value qp value
-    time               4688.045973  5999.959907      0.0      NaN
-    heat_pump               {True}       {True}      0.0      NaN
-    duration_increase         1000         1000      0.0      0.0
+                    box 3 (39%)
+                      min          max      qp value qp value
+    heat_pump      {True}       {True}  0.000000e+00      NaN
+    COP          2.449967      3.79998  2.257028e-35      NaN
+    time       4202.22133  5999.959907  6.259317e-29      NaN
 
-                    box 5 (29%dens @easy cost<150 and ES<300)
-                      min          max       qp value qp value
-    heat_pump       {True}       {True}   0.000000e+00      NaN
-    COP           2.706599      3.79998  1.732937e-218      NaN
-    time       4200.655921  5999.959907   3.596869e-22      NaN
+                    box 3 (30%)
+                      min          max      qp value qp value
+    heat_pump      {True}       {True}  0.000000e+00      NaN
+    COP          2.449967      3.79998  2.257028e-35      NaN
+    time       4202.22133  5999.959907  6.259317e-29      NaN
