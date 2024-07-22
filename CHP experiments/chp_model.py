@@ -294,7 +294,7 @@ class CHP_plant:
             else:
                 return x1 + (x2 - x1) * (ynew - y1) / (y2 - y1)
         
-        Qsupp = linear_interpolation(curve, Tsupp)
+        Qsupp = linear_interpolation(curve, 86) # BUG: Hard-coded Tsupp=86C since higher temp. heat won't be available
         Qlow = linear_interpolation(curve, Tlow)
         Qpinch, Tpinch = curve[max_curvature_index][0], curve[max_curvature_index][1]
         if Qlow < Qpinch:

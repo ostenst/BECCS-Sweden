@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import make_interp_spline
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
 
@@ -45,6 +46,9 @@ Z = example['captured'].values
 
 # plt.show()
 
+# Read data and prepare example data
+example = pulp_outcomes[pulp_outcomes['Name'] == "Ostrand"]
+
 # Create bins for penalty_biomass
 num_bins = 10
 example['penalty_biomass_bins'] = pd.cut(example['penalty_biomass'], bins=num_bins)
@@ -70,9 +74,9 @@ for bin_range, group in grouped:
     percentile_5th.append(percentile_5th_val)
     percentile_95th.append(percentile_95th_val)
     
-    print(f"\nBin range: {bin_range}")
-    print(group)
-    print(f"Mean: {mean_val}, 5th percentile: {percentile_5th_val}, 95th percentile: {percentile_95th_val}")
+    # print(f"\nBin range: {bin_range}")
+    # print(group)
+    # print(f"Mean: {mean_val}, 5th percentile: {percentile_5th_val}, 95th percentile: {percentile_95th_val}")
 
 # Convert lists to numpy arrays
 bin_centers = np.array([bin.mid for bin in bin_ranges])  # Get the bin centers for plotting
@@ -90,14 +94,27 @@ percentile_95th = percentile_95th[valid_indices]
 
 # Smooth lines using spline interpolation
 bin_centers_smooth = np.linspace(min(bin_centers), max(bin_centers), 300)
-means_smooth = make_interp_spline(bin_centers, means,k=2)(bin_centers_smooth)
-percentile_5th_smooth = make_interp_spline(bin_centers, percentile_5th,k=2)(bin_centers_smooth)
-percentile_95th_smooth = make_interp_spline(bin_centers, percentile_95th,k=2)(bin_centers_smooth)
+means_smooth = make_interp_spline(bin_centers, means, k=2)(bin_centers_smooth)
+percentile_5th_smooth = make_interp_spline(bin_centers, percentile_5th, k=2)(bin_centers_smooth)
+percentile_95th_smooth = make_interp_spline(bin_centers, percentile_95th, k=2)(bin_centers_smooth)
 
+# Linear regression for means
+mean_reg = LinearRegression().fit(bin_centers.reshape(-1, 1), means)
+mean_line = mean_reg.predict(bin_centers.reshape(-1, 1))
+
+# Linear regression for 5th percentile
+percentile_5th_reg = LinearRegression().fit(bin_centers.reshape(-1, 1), percentile_5th)
+percentile_5th_line = percentile_5th_reg.predict(bin_centers.reshape(-1, 1))
+
+# Linear regression for 95th percentile
+percentile_95th_reg = LinearRegression().fit(bin_centers.reshape(-1, 1), percentile_95th)
+percentile_95th_line = percentile_95th_reg.predict(bin_centers.reshape(-1, 1))
+
+# Plotting smooth lines
 plt.figure(figsize=(10, 6))
-plt.plot(bin_centers_smooth, means_smooth, color='blue', label='Mean')
-plt.plot(bin_centers_smooth, percentile_5th_smooth, color='green', label='5th Percentile')
-plt.plot(bin_centers_smooth, percentile_95th_smooth, color='red', label='95th Percentile')
+plt.plot(bin_centers_smooth, means_smooth, color='blue', label='Mean (Smooth)')
+plt.plot(bin_centers_smooth, percentile_5th_smooth, color='green', label='5th Percentile (Smooth)')
+plt.plot(bin_centers_smooth, percentile_95th_smooth, color='red', label='95th Percentile (Smooth)')
 
 # Add scatter points for means, 5th and 95th percentiles
 plt.scatter(bin_centers, means, color='blue', edgecolor='k', zorder=5)
@@ -106,7 +123,25 @@ plt.scatter(bin_centers, percentile_95th, color='red', edgecolor='k', zorder=5)
 
 plt.xlabel('Penalty Biomass (Bin Centers)')
 plt.ylabel('Penalty Services')
-plt.title('Penalty Services Statistics by Penalty Biomass Bins')
+plt.title('Penalty Services Statistics by Penalty Biomass Bins (Smooth Lines)')
+plt.legend()
+plt.grid(True)
+# plt.show()
+
+# Plotting linear regression lines
+plt.figure(figsize=(10, 6))
+plt.plot(bin_centers, mean_line, color='blue', label='Mean (Linear Regression)')
+plt.plot(bin_centers, percentile_5th_line, color='green', label='5th Percentile (Linear Regression)')
+plt.plot(bin_centers, percentile_95th_line, color='red', label='95th Percentile (Linear Regression)')
+
+# Add scatter points for means, 5th and 95th percentiles
+plt.scatter(bin_centers, means, color='blue', edgecolor='k', zorder=5)
+plt.scatter(bin_centers, percentile_5th, color='green', edgecolor='k', zorder=5)
+plt.scatter(bin_centers, percentile_95th, color='red', edgecolor='k', zorder=5)
+
+plt.xlabel('Penalty Biomass (Bin Centers)')
+plt.ylabel('Penalty Services')
+plt.title('Penalty Services Statistics by Penalty Biomass Bins (Linear Regression)')
 plt.legend()
 plt.grid(True)
 plt.show()

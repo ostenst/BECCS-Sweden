@@ -104,8 +104,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 200
-    n_policies = 15
+    n_scenarios = 250
+    n_policies = 40
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results

@@ -1,25 +1,6 @@
+
 /// ALL SECTORS ///
 Difficult to set thresholds. At ZeroBiomass we most likely need around 200-400 MWh/kt (i.e. 1 GJ/t) of penalty_services no matter what!
-
---- Pulp sector ---
-At this satisficing level:
-y = (pulp_outcomes["capture_cost"] < 85) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200) #BUT MAYBE KEEP BIOMASS HIGH ANYWAY?
- 
-PRIM found:
-                    box 8 (58% dense)
-                      min        max qp value       qp value
-BarkIncrease          0.0       30.0      NaN   0.000000e+00
-celc            20.019024  72.451906      NaN  1.008608e-111
-SupplyStrategy  {SteamLP}  {SteamLP}      0.0            NaN
-
-
-PRIM found (@ZeroBiomass):
-                     box 9 (62% dense)
-                       min        max qp value      qp value
-factor_recovery    0.39001   0.406121      NaN  2.707367e-37
-celc             20.019024  92.006106      NaN  1.206035e-07
-SupplyStrategy   {SteamLP}  {SteamLP}      0.0           NaN
-
 
 --- Reflection --- 
 The above sequence of scenarios works and I think it is adequate for a WHOLE POPULATION analysis. 
@@ -31,36 +12,51 @@ If using PRIM on whole population: LP+elc is a winnner in BALANCED and in ZEROBI
 
 
 --- CHP sector ---
-The satisficing level is perhaps another than pulp. I tried this:
-OUTDATED y = (chp_outcomes["capture_cost"] < 100) & (chp_outcomes["penalty_services"] < 200) & (chp_outcomes["penalty_biomass"] < 450)
-Which is easy with moderate increases in biomass. But without increases it is not possible/difficult to achieve low penalty_services!
-  @ZeroBiomass it is easier for smaller CHPs to recover heat and reduce the penalty. Probably an issue with the Aspen model.
-  ISSUE: I will not be able to show that large plants can more easily recover excess heat
-  ISSUE: in ZeroBiomass scenario it will look like small is better at converting energy! Wrong! So keep the acceptable cost low to circumvent the issue.
-  SOLUTION: I should ensure all CHPs can recover all waste heat - DONE :)
+The jump between map1 and map2 is great! But the ZeroBiomass conditions are just unreliable.
+A solution is to SEARCH for slightly easier thresholds to ensure PRIM works. But then still illustrate the tight thresholds in results! Will try this:
+y = (filtered_outcomes["capture_cost"] < 150) & (filtered_outcomes["penalty_services"] < 300) & (filtered_outcomes["penalty_biomass"] < 500)
 
-At this satisficing level:
-y = (chp_outcomes["capture_cost"] < 100) & (chp_outcomes["penalty_services"] < 350) & (chp_outcomes["penalty_biomass"] < 450)
- 
-PRIM found:
-                       box 10 (58% dense @VÄRTAVERKET others perform to bad so I should divide the analysis between plant sizes)
-                          min          max      qp value      qp value
-duration_increase         0.0       1000.0           NaN  2.397119e-52
-heat_pump              {True}       {True}  1.655178e-97           NaN
-time               5160.46861  5996.708382  1.283369e-85           NaN
+IMPORTANT: Using ["penalty_services"] < 200 works, but makes the biomass scenario terrible. So then map1 and map3 will be red, while map2 will be green.
+Given this, I should probably redo this analysis but for < 300. This gives interesting result that Tlow matters, and map1 is red map2 is green map3 is orange.
 
+Thresholds:
+y = (filtered_outcomes["capture_cost"] < 100) & (filtered_outcomes["penalty_services"] < 200) & (filtered_outcomes["penalty_biomass"] < 500)
 
-PRIM found (@ZeroBiomass):
-               box 7 (60% dense VÄRTAVERKET)
-                 min        max       qp value  qp value
-celc       20.112614  92.238603            NaN  0.015936
-heat_pump     {True}     {True}  1.264542e-102       NaN
-COP         2.930146    3.79528   3.299424e-30       NaN
+Scenarios (>300kt plants):
+                            box 8 (86%dens)
+                              min          max qp value qp value
+    time               4822.332392  5999.325117      0.0      NaN
+    heat_pump               {True}       {True}      0.0      NaN
+    duration_increase         1000         1000      0.0      0.0
 
+                  box 13 (83%dens @easy cost<150 and ES<300)
+                    min        max       qp value      qp value
+    Tlow       43.010662  50.754191            NaN  7.793870e-28
+    heat_pump     {True}     {True}   0.000000e+00           NaN
+    COP         3.156986   3.796595  1.446576e-180           NaN
 
---- W2E sector ---
-              box 7
-                min       max qp value      qp value
-i           0.05001   0.10406      NaN  2.247014e-17
-COP        2.913555  3.799993      0.0           NaN
-heat_pump    {True}    {True}      0.0           NaN
+Scenarios (200-300kt plants):
+                         box 8 (79%dens)
+                              min          max qp value qp value
+    time               4821.350064  5999.467367      0.0      NaN
+    heat_pump               {True}       {True}      0.0      NaN
+    duration_increase         1000         1000      0.0      0.0
+
+                box 12 (81%dens @easy cost<150 and ES<300)
+                    min       max qp value      qp value
+    i          0.050017  0.097682      NaN  1.851772e-15
+    COP        3.222013  3.799497      0.0           NaN
+    heat_pump    {True}    {True}      0.0           NaN
+
+Scenarios (<200kt plants):
+                            box 7 (72%dens @easier cost<150)
+                              min          max qp value qp value
+    time               4688.045973  5999.959907      0.0      NaN
+    heat_pump               {True}       {True}      0.0      NaN
+    duration_increase         1000         1000      0.0      0.0
+
+                    box 5 (29%dens @easy cost<150 and ES<300)
+                      min          max       qp value qp value
+    heat_pump       {True}       {True}   0.000000e+00      NaN
+    COP           2.706599      3.79998  1.732937e-218      NaN
+    time       4200.655921  5999.959907   3.596869e-22      NaN
