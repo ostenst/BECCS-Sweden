@@ -38,7 +38,7 @@ y = (pulp_outcomes["capture_cost"] < 80) & (pulp_outcomes["penalty_services"] < 
 print(y.sum(),"scenarios are satisficing out of", len(y))
 
 
-prim_alg = prim.Prim(x, y, threshold=0.6, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
+prim_alg = prim.Prim(x, y, threshold=0.5, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
 box1 = prim_alg.find_box()
 
 box1.show_tradeoff()        # Pareto tradeoff 

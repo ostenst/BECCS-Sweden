@@ -62,11 +62,19 @@ SupplyStrategy  {SteamLP}  {SteamLP}      0.0           NaN
         COP                2.827737     3.797916  2.869435e-26           NaN
 
 VARÖ
-                               box 3 (20%)
+                               box 3 (20%), if just 3 dimensions 
                                  min                   max      qp value      qp value
 BarkIncrease                     0.0                  60.0           NaN  6.142768e-55
 SupplyStrategy  {SteamLP, HeatPumps}  {SteamLP, HeatPumps}  2.628613e-96           NaN
 rate                        0.800356              0.939259  1.432273e-09           NaN
+                     box 13 (48%), cheating with 6 dimensions :)
+                        min          max       qp value      qp value
+BarkIncrease            0.0         60.0            NaN  3.589456e-43
+celc              20.014078    78.228241            NaN  7.561324e-29
+beta               0.600137     0.687478            NaN  4.696614e-03
+SupplyStrategy  {HeatPumps}  {HeatPumps}  1.056562e-142           NaN
+COP                2.918199      3.79726   6.179286e-83           NaN
+rate               0.800356     0.939259   2.935936e-04           NaN
                      box 13 (62%), cheating with 4 dimensions :)
                         min          max      qp value      qp value
 celc              20.014078    84.841502           NaN  1.862263e-11
