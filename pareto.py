@@ -1,11 +1,35 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from scipy.interpolate import make_interp_spline
-import numpy as np
-from sklearn.linear_model import LinearRegression
+# def binning_biomass(group):
+#     # I think the bins are ok now???
+#     zero_values = group[group['penalty_biomass'] == 0]
+#     non_zero_values = group[group['penalty_biomass'] != 0]
+    
+#     if non_zero_values.empty:
+#         # This is True for Aspa, and for W2E plants 
+#         zero_values['biomass_bins'] = pd.Interval(left=-float('inf'), right=float('inf'), closed='right')
+#         combined = zero_values
+#     else:
+#         # Define bin edges
+#         bin_edges = pd.qcut(non_zero_values['penalty_biomass'], q=8, retbins=True)[1]
+#         bin_edges = [-float('inf')] + list(bin_edges) + [float('inf')] # WHEN THIS CREATES 8-9 BINS???
+#         # bin_edges = list(bin_edges) + [float('inf')] # WHY DOES THIS ONLY CREATE 2 BINS
+        
+#         # Print bin edges for debugging
+#         print(f"Bin edges for group '{group['Name'].iloc[0]}': {bin_edges}")
+#         print("The bins are now ok...")
 
+#         # Assign bins to non-zero values
+#         non_zero_values['biomass_bins'] = pd.cut(non_zero_values['penalty_biomass'], bins=bin_edges, include_lowest=True)
+        
+#         # Assign zero values to the first bin
+#         if not zero_values.empty:
+#             zero_values['biomass_bins'] = pd.Interval(left=-float('inf'), right=bin_edges[1], closed='right')
+#             # Could this be adding a new bin?
+        
+#         # Combine the zero and non-zero value DataFrames
+#         combined = pd.concat([zero_values, non_zero_values])
 
+#     return combined
 
 # Read data
 chp_experiments = pd.read_csv("CHP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
@@ -17,131 +41,120 @@ w2e_outcomes = pd.read_csv("WASTE experiments/all_outcomes.csv", delimiter=",", 
 pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
-# Determine example data
-example = pulp_outcomes[pulp_outcomes['Name'] == "Ostrand"]
+# Adding all together!
+chp_outcomes = pd.concat([chp_outcomes, w2e_outcomes])
+chp_outcomes = pd.concat([chp_outcomes, pulp_outcomes])
 
-# Create vectors
-X = example['penalty_services'].values
-Y = example['penalty_biomass'].values
-Z = example['captured'].values
+if 'penalty_biomass' not in chp_outcomes.columns or 'Name' not in chp_outcomes.columns:
+    raise ValueError("Required columns 'penalty_biomass' or 'Name' not found in chp_outcomes DataFrame.")
 
+chp_outcomes = chp_outcomes.reset_index()
+chp_outcomes = chp_outcomes.iloc[300:1000,:]
+print(chp_outcomes)
 
-# # Plotting
-# plt.figure(figsize=(10, 6))
-# plt.hist2d(X, Y, bins=30, cmap='Blues')
-# plt.colorbar(label='Counts')
-
-# plt.xlabel('Penalty Services')
-# plt.ylabel('Penalty Biomass')
-# plt.title('2D Histogram of Penalty Services and Penalty Biomass')
-# plt.grid(True)
-
-# # Scatter plot
-# plt.figure(figsize=(10, 6))
-# plt.scatter(X, Y, alpha=0.5, edgecolor='k')
-# plt.xlabel('Penalty Services')
-# plt.ylabel('Penalty Biomass')
-# plt.title('Scatter Plot of Penalty Services and Penalty Biomass')
-# plt.grid(True)
-
-# plt.show()
-
-# Read data and prepare example data
-example = pulp_outcomes[pulp_outcomes['Name'] == "Ostrand"]
-
-# Create bins for penalty_biomass
-num_bins = 10
-example['penalty_biomass_bins'] = pd.cut(example['penalty_biomass'], bins=num_bins)
-
-# Group by bins
-grouped = example.groupby('penalty_biomass_bins')
-
-# Lists to store bin ranges and corresponding statistics
-bin_ranges = []
-means = []
-percentile_5th = []
-percentile_95th = []
-
-# Iterate over groups to calculate statistics and plot
-for bin_range, group in grouped:
-    bin_ranges.append(bin_range)
+def binning_biomass(group):
+    # Define the number of bins you want for non-zero penalty_biomass values
+    num_bins = 9
     
-    mean_val = group['penalty_services'].mean()
-    percentile_5th_val = group['penalty_services'].quantile(0.05)
-    percentile_95th_val = group['penalty_services'].quantile(0.95)
+    # Ensure 'Name' column is preserved and accessible
+    if 'Name' not in group.columns:
+        raise ValueError("Column 'Name' not found in the group DataFrame.")
     
-    means.append(mean_val)
-    percentile_5th.append(percentile_5th_val)
-    percentile_95th.append(percentile_95th_val)
+    # Print the minimum penalty_biomass for debugging
+    min_penalty_biomass = group['penalty_biomass'].min()
+    print(f"Min penalty_biomass for group '{group['Name'].iloc[0]}' is {min_penalty_biomass}")
     
-    # print(f"\nBin range: {bin_range}")
-    # print(group)
-    # print(f"Mean: {mean_val}, 5th percentile: {percentile_5th_val}, 95th percentile: {percentile_95th_val}")
+    # Separate the group into zero and non-zero penalty_biomass
+    zero_penalty = group[group['penalty_biomass'] == 0]
+    non_zero_penalty = group[group['penalty_biomass'] > 0]
+    
+    # Create bins for non-zero penalty_biomass values
+    if not non_zero_penalty.empty:
+        bin_edges = pd.cut(non_zero_penalty['penalty_biomass'], bins=num_bins, retbins=True)[1]
+        print(len(bin_edges))
+        print(bin_edges) # THIS IS WHERE THE BINS ARE CREATED. ONE (OR MORE) ARE LOST SINCE NOT ALL BINS ARE FILLED WITH VALUES
+        non_zero_penalty['biomass_bins'] = pd.cut(non_zero_penalty['penalty_biomass'], bins=bin_edges)
+        
+        # Create intervals from the bin edges
+        bin_intervals = pd.IntervalIndex.from_breaks(bin_edges)
+        bin_labels = bin_intervals.to_list()
+        bin_index = {label: idx for idx, label in enumerate(bin_labels)}
+        
+        # print(f"\nBin intervals for group '{group['Name'].iloc[0]}': {bin_intervals}")
+        print(f"\nBin labels and indices: {bin_index}")
+    else:
+        bin_intervals = pd.IntervalIndex([])
+        bin_index = {}
+        print(f"No non-zero penalty_biomass values for group '{group['Name'].iloc[0]}'")
+    
+    # Assign a separate bin label for zero penalty_biomass values
+    zero_penalty['biomass_bins'] = 'Zero Penalty'
+    
+    # Concatenate the zero and non-zero groups back together
+    binned_group = pd.concat([zero_penalty, non_zero_penalty])
+    
+    # Print the number of unique bins
+    print(f"Total unique bins for group '{group['Name'].iloc[0]}': {len(binned_group['biomass_bins'].unique())}")
+    
+    return binned_group
 
-# Convert lists to numpy arrays
-bin_centers = np.array([bin.mid for bin in bin_ranges])  # Get the bin centers for plotting
-bin_centers[0] = 0
-means = np.array(means)
-percentile_5th = np.array(percentile_5th)
-percentile_95th = np.array(percentile_95th)
+# Apply the binning function to each group
+chp_outcomes = chp_outcomes.groupby('Name').apply(binning_biomass)
+chp_outcomes = chp_outcomes.reset_index(drop=True)
+for name, group in chp_outcomes.groupby('Name'):
+    print(f"\nBins for plant '{name}':")
+    print(len(group['biomass_bins'].unique()))
 
-# Remove NaN and Inf values
-valid_indices = ~np.isnan(means) & ~np.isinf(means)
-bin_centers = bin_centers[valid_indices]
-means = means[valid_indices]
-percentile_5th = percentile_5th[valid_indices]
-percentile_95th = percentile_95th[valid_indices]
 
-# Smooth lines using spline interpolation
-bin_centers_smooth = np.linspace(min(bin_centers), max(bin_centers), 300)
-means_smooth = make_interp_spline(bin_centers, means, k=2)(bin_centers_smooth)
-percentile_5th_smooth = make_interp_spline(bin_centers, percentile_5th, k=2)(bin_centers_smooth)
-percentile_95th_smooth = make_interp_spline(bin_centers, percentile_95th, k=2)(bin_centers_smooth)
+grouped = chp_outcomes.groupby(['Name', 'biomass_bins'])
+total_captured = chp_outcomes.groupby('Name')['captured'].mean().reset_index()
+total_captured.rename(columns={'captured': 'Total Captured'}, inplace=True)
+total_captured = total_captured.sort_values(by='Total Captured', ascending=False)
 
-# Linear regression for means
-mean_reg = LinearRegression().fit(bin_centers.reshape(-1, 1), means)
-mean_line = mean_reg.predict(bin_centers.reshape(-1, 1))
+# Calculate statistics within each bin
+statistics = []
+for (name, bin_name), group in grouped:
+    mean_captured = group['captured'].mean() if 'captured' in group.columns else None
+    mean_penalty_services = group['penalty_services'].mean() if 'penalty_services' in group.columns else None
+    percentile_5th_val = group['penalty_services'].quantile(0.05) if 'penalty_services' in group.columns else None
+    percentile_95th_val = group['penalty_services'].quantile(0.95) if 'penalty_services' in group.columns else None
+    
+    stats = {
+        'Name': name,
+        'Biomass Bin': bin_name,
+        'Mean Captured': mean_captured,
+        'Mean Penalty': mean_penalty_services,
+        '5th Penalty': percentile_5th_val,
+        '95th Penalty': percentile_95th_val
+    }
+    statistics.append(stats)
 
-# Linear regression for 5th percentile
-percentile_5th_reg = LinearRegression().fit(bin_centers.reshape(-1, 1), percentile_5th)
-percentile_5th_line = percentile_5th_reg.predict(bin_centers.reshape(-1, 1))
+stats_df = pd.DataFrame(statistics)
+print("\nStatistics for each biomass bin and plant:")
+print(stats_df)
 
-# Linear regression for 95th percentile
-percentile_95th_reg = LinearRegression().fit(bin_centers.reshape(-1, 1), percentile_95th)
-percentile_95th_line = percentile_95th_reg.predict(bin_centers.reshape(-1, 1))
+print("\nTotal Mean Captured for each 'Name':")
+print(total_captured)
 
-# Plotting smooth lines
-plt.figure(figsize=(10, 6))
-plt.plot(bin_centers_smooth, means_smooth, color='blue', label='Mean (Smooth)')
-plt.plot(bin_centers_smooth, percentile_5th_smooth, color='green', label='5th Percentile (Smooth)')
-plt.plot(bin_centers_smooth, percentile_95th_smooth, color='red', label='95th Percentile (Smooth)')
+# Define a function to calculate the midpoint of a bin range
+def get_bin_midpoint(bin_interval):
+    if bin_interval == 'Zero Penalty':
+        return 0
+    return (bin_interval.left + bin_interval.right) / 2
 
-# Add scatter points for means, 5th and 95th percentiles
-plt.scatter(bin_centers, means, color='blue', edgecolor='k', zorder=5)
-plt.scatter(bin_centers, percentile_5th, color='green', edgecolor='k', zorder=5)
-plt.scatter(bin_centers, percentile_95th, color='red', edgecolor='k', zorder=5)
+stats_df['Mean Biomass'] = stats_df['Biomass Bin'].apply(get_bin_midpoint)
+print("\nStatistics with Mean Biomass:")
+print(stats_df)
 
-plt.xlabel('Penalty Biomass (Bin Centers)')
-plt.ylabel('Penalty Services')
-plt.title('Penalty Services Statistics by Penalty Biomass Bins (Smooth Lines)')
-plt.legend()
-plt.grid(True)
-# plt.show()
+# Time to summarize bins. Do it by estimating the captured volumes first, to append correct plants to the list.
+name_list = [] 
+estimated_capture = 0
+i = 0
+sorted_total_captured = total_captured.sort_values(by='Total Captured', ascending=False)
 
-# Plotting linear regression lines
-plt.figure(figsize=(10, 6))
-plt.plot(bin_centers, mean_line, color='blue', label='Mean (Linear Regression)')
-plt.plot(bin_centers, percentile_5th_line, color='green', label='5th Percentile (Linear Regression)')
-plt.plot(bin_centers, percentile_95th_line, color='red', label='95th Percentile (Linear Regression)')
-
-# Add scatter points for means, 5th and 95th percentiles
-plt.scatter(bin_centers, means, color='blue', edgecolor='k', zorder=5)
-plt.scatter(bin_centers, percentile_5th, color='green', edgecolor='k', zorder=5)
-plt.scatter(bin_centers, percentile_95th, color='red', edgecolor='k', zorder=5)
-
-plt.xlabel('Penalty Biomass (Bin Centers)')
-plt.ylabel('Penalty Services')
-plt.title('Penalty Services Statistics by Penalty Biomass Bins (Linear Regression)')
-plt.legend()
-plt.grid(True)
-plt.show()
+while estimated_capture < 130 and i < len(sorted_total_captured):
+    estimated_capture += sorted_total_captured["Total Captured"].iloc[i]
+    name_list.append(sorted_total_captured["Name"].iloc[i])
+    i += 1
+print("\nName list sorted by Total Captured and ensuring estimated_capture >= YOUR GUESS:")
+print(name_list)
