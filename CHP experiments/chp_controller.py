@@ -72,7 +72,7 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("CEPCI", 1.0, 1.2),
         RealParameter("fixed", 0.04, 0.08),
         RealParameter("ownercost", 0.1, 0.4),
-        RealParameter("WACC", 0.03, 0.09),
+        RealParameter("WACC", 0.03, 0.09), # REF https://iopscience.iop.org/article/10.1088/1748-9326/aa67a5/meta Dowell, Inefficient BECCS
         IntegerParameter("yexpenses", 2, 6),
         RealParameter("rescalation", 0.02, 0.06),
         RealParameter("i", 0.05, 0.11),
