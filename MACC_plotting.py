@@ -14,7 +14,7 @@ pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", 
 
 # Combine the outcomes dataframes, sort by capture_cost [EUR/t] and calculate the total energy services penalty [MWh/yr]
 combined_outcomes = pd.concat([chp_outcomes, w2e_outcomes, pulp_outcomes])
-combined_outcomes = combined_outcomes[ combined_outcomes["penalty_biomass"] == 0 ]
+# combined_outcomes = combined_outcomes[ combined_outcomes["penalty_biomass"] == 0 ]
 
 grouped = combined_outcomes.groupby("Name")["capture_cost"].mean()
 grouped = combined_outcomes.groupby("Name")["captured"].mean()
@@ -106,7 +106,7 @@ ax1.grid(axis='y')
 # Add legends for both y-axes
 lines1, labels1 = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-# ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper center", fontsize=14)
+ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper center", fontsize=14)
 
 plt.tight_layout()
 plt.show()

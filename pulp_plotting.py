@@ -265,82 +265,11 @@ plot_minmax_values(pulp_outcomes, "penalty_services")
 plot_minmax_values(pulp_outcomes, "penalty_biomass")
 
 
-# BELOW IS FOR REGULAR SCENARIO
-numerical_restrictions_1 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 72),
-    # 'rate': (0.78, 0.893),
-}
-categorical_restrictions_1 = {
-    "SupplyStrategy": ["SteamLP"],
-    "BarkIncrease": [0]
-}
-
-numerical_restrictions_2 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 92),
-    'BarkIncrease': (None, 31),
-}
-categorical_restrictions_2 = {
-    "SupplyStrategy": ["SteamLP"],
-    # "BarkIncrease": [0]
-}
-
-numerical_restrictions_3 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 84),
-    # 'BarkIncrease': (None, 31),
-}
-categorical_restrictions_3 = {
-    "SupplyStrategy": ["SteamLP"],
-    "BarkIncrease": [0]
-}
-
-numerical_restrictions_4 = {
-    'COP': (2.83, 3.80),
-    'celc': (20, 63),
-    # 'BarkIncrease': (None, 31),
-}
-categorical_restrictions_4 = {
-    "SupplyStrategy": ["HeatPumps"],
-    # "BarkIncrease": [0]
-}
-
-numerical_restrictions_5 = {
-    'COP': (2.9, 3.80),
-    # 'rate': (0.80, 94),
-    'celc': (20, 78),
-}
-categorical_restrictions_5 = {
-    "SupplyStrategy": ["HeatPumps"],
-    # "BarkIncrease": [0]
-}
-
-numerical_restrictions_6 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 67),
-    'BarkIncrease': (None, 31),
-}
-categorical_restrictions_6 = {
-    "SupplyStrategy": ["SteamLP"],
-    # "BarkIncrease": [0]
-}
-
-numerical_restrictions_7 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 73),
-    'BarkIncrease': (None, 31),
-}
-categorical_restrictions_7 = {
-    "SupplyStrategy": ["SteamLP"],
-    # "BarkIncrease": [0]
-}
-
-# # BELOW ARE ZERO BIOMASS SCENARIOS
+# # BELOW IS FOR REGULAR SCENARIO
 # numerical_restrictions_1 = {
 #     # 'COP': (3.28, 3.80),
 #     'celc': (20, 72),
-#     'CEPCI': (1, 1.16),
+#     # 'rate': (0.78, 0.893),
 # }
 # categorical_restrictions_1 = {
 #     "SupplyStrategy": ["SteamLP"],
@@ -348,17 +277,17 @@ categorical_restrictions_7 = {
 # }
 
 # numerical_restrictions_2 = {
-#     'beta': (0.6, 0.67),
-#     'celc': (20, 62),
-#     # 'BarkIncrease': (None, 31),
+#     # 'COP': (3.28, 3.80),
+#     'celc': (20, 92),
+#     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_2 = {
 #     "SupplyStrategy": ["SteamLP"],
-#     "BarkIncrease": [0]
+#     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_3 = {
-#     'beta': (0.6, 0.68),
+#     # 'COP': (3.28, 3.80),
 #     'celc': (20, 84),
 #     # 'BarkIncrease': (None, 31),
 # }
@@ -374,38 +303,109 @@ categorical_restrictions_7 = {
 # }
 # categorical_restrictions_4 = {
 #     "SupplyStrategy": ["HeatPumps"],
-#     "BarkIncrease": [0]
+#     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_5 = {
-#     'COP': (3.1, 3.80),
-#     'celc': (20, 84),
-#     # 'BarkIncrease': (None, 61),
+#     'COP': (2.9, 3.80),
+#     # 'rate': (0.80, 94),
+#     'celc': (20, 78),
 # }
 # categorical_restrictions_5 = {
 #     "SupplyStrategy": ["HeatPumps"],
-#     "BarkIncrease": [0]
+#     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_6 = {
-#     'rate': (0.82, 0.92),
-#     'celc': (20, 92),
-#     # 'BarkIncrease': (None, 31),
+#     # 'COP': (3.28, 3.80),
+#     'celc': (20, 67),
+#     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_6 = {
 #     "SupplyStrategy": ["SteamLP"],
-#     "BarkIncrease": [0]
+#     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_7 = {
-#     'rate': (0.79, 0.92),
-#     'celc': (20, 78),
-#     # 'BarkIncrease': (None, 31),
+#     # 'COP': (3.28, 3.80),
+#     'celc': (20, 73),
+#     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_7 = {
 #     "SupplyStrategy": ["SteamLP"],
-#     "BarkIncrease": [0]
+#     # "BarkIncrease": [0]
 # }
+
+# BELOW ARE ZERO BIOMASS SCENARIOS
+numerical_restrictions_1 = {
+    # 'COP': (3.28, 3.80),
+    'celc': (20, 72),
+    'CEPCI': (1, 1.16),
+}
+categorical_restrictions_1 = {
+    "SupplyStrategy": ["SteamLP"],
+    "BarkIncrease": [0]
+}
+
+numerical_restrictions_2 = {
+    'beta': (0.6, 0.67),
+    'celc': (20, 62),
+    # 'BarkIncrease': (None, 31),
+}
+categorical_restrictions_2 = {
+    "SupplyStrategy": ["SteamLP"],
+    "BarkIncrease": [0]
+}
+
+numerical_restrictions_3 = {
+    'beta': (0.6, 0.68),
+    'celc': (20, 84),
+    # 'BarkIncrease': (None, 31),
+}
+categorical_restrictions_3 = {
+    "SupplyStrategy": ["SteamLP"],
+    "BarkIncrease": [0]
+}
+
+numerical_restrictions_4 = {
+    'COP': (2.83, 3.80),
+    'celc': (20, 63),
+    # 'BarkIncrease': (None, 31),
+}
+categorical_restrictions_4 = {
+    "SupplyStrategy": ["HeatPumps"],
+    "BarkIncrease": [0]
+}
+
+numerical_restrictions_5 = {
+    'COP': (3.1, 3.80),
+    'celc': (20, 84),
+    # 'BarkIncrease': (None, 61),
+}
+categorical_restrictions_5 = {
+    "SupplyStrategy": ["HeatPumps"],
+    "BarkIncrease": [0]
+}
+
+numerical_restrictions_6 = {
+    'rate': (0.82, 0.92),
+    'celc': (20, 92),
+    # 'BarkIncrease': (None, 31),
+}
+categorical_restrictions_6 = {
+    "SupplyStrategy": ["SteamLP"],
+    "BarkIncrease": [0]
+}
+
+numerical_restrictions_7 = {
+    'rate': (0.79, 0.92),
+    'celc': (20, 78),
+    # 'BarkIncrease': (None, 31),
+}
+categorical_restrictions_7 = {
+    "SupplyStrategy": ["SteamLP"],
+    "BarkIncrease": [0]
+}
 
 restrictions = [            [numerical_restrictions_1, categorical_restrictions_1], 
                             [numerical_restrictions_2, categorical_restrictions_2],
