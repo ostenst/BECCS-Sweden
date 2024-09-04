@@ -337,7 +337,7 @@ class W2E_plant:
         # Adding cost of HEXs (+~2% cost)
         Qhex = self.results["Qrecovered"] - self.technology_assumptions["heat_pump"] #[MW]
         U = self.technology_assumptions["U"] /1000                                   #[kW/m2K]
-        A = Qhex*1000/(U * self.technology_assumptions["dTmin"])
+        A = Qhex*1000/(U * self.technology_assumptions["dTmin"])                     # This overestimates the area as dTmin<dTln so it is pessimistic costwise
         CAPEX_hex = X["cHEX"]*A**0.9145                                                  #[kEUR] Original val: 0.571 (Eliasson, 2022)
         CAPEX += CAPEX_hex
 
@@ -434,6 +434,7 @@ def CCS_CHP(
     Tlow=38,
     dTmin=7,
     COP = 3,
+    U = 1500,
 
     alpha=6.12,
     beta=0.6336,
@@ -463,7 +464,7 @@ def CCS_CHP(
     CHP=None
 ):
     technology_assumptions = {
-        'U': CHP.energybalance_assumptions["U"],
+        'U': U,
         "time": time,
         "duration_increase": 0,         # This is the main difference compared to wood chip fired CHP
         # "HEX_optimization": int(HEX_optimization),
@@ -552,10 +553,8 @@ if __name__ == "__main__":
 
     # Initate a CHP and calculate its nominal energy balance
     energybalance_assumptions = {
-        # "time": 5500,                    #[h/yr]
-        "U": 1500                        #[W/m2K]
+        # "U": 1500                        #[W/m2K]
         # "m_fluegas": simplified from Tharun's study
-        # "HEX costs": taken from Eliasson (2022)
     }
 
     CHP = W2E_plant(

@@ -1,12 +1,7 @@
 """Stuff here controller"""
 
-# import math
 import numpy as np
-# from scipy.optimize import brentq
-# from scipy.interpolate import LinearNDInterpolator
-# from ema_workbench.em_framework.evaluators import Samplers
 from waste_model import *
-import matplotlib.pyplot as plt  
 import seaborn as sns
 import pandas as pd
 from ema_workbench import (
@@ -21,12 +16,10 @@ from ema_workbench import (
     ema_logging,
     perform_experiments
 )
-from ema_workbench.analysis import prim
-# from prim_constrained import *
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("WASTE data all.csv",delimiter=";")
-# plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
+plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
 all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
 
@@ -39,10 +32,8 @@ for index, plant_data in plants_df.iterrows():
     print(f"||| MODELLING {plant_data['Plant Name']} WASTE CHP |||")
 
     energybalance_assumptions = {
-        # "time": 5500,                    #[h/yr]
-        "U": 1500                        #[W/m2K]
+        # "U": 1500                        #[W/m2K]
         # "m_fluegas": simplified from Tharun's study
-        # "HEX costs": taken from Eliasson (2022)
     }
 
     CHP = W2E_plant(
@@ -63,9 +54,10 @@ for index, plant_data in plants_df.iterrows():
     model.uncertainties = [
         RealParameter("dTreb", 7, 14),       #[tCO2/MWh]
         RealParameter("Tsupp", 78, 100),
-        RealParameter("Tlow", 43, 55),       #[kg/t]
+        RealParameter("Tlow", 43, 55),     
         RealParameter("COP", 2.3, 3.8),
         RealParameter("dTmin", 5, 12),
+        RealParameter("U", 1300, 1700),
 
         RealParameter("alpha", 6, 7),
         RealParameter("beta", 0.6, 0.7),
@@ -87,7 +79,6 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("time", 7800, 8200),
     ]
     model.levers = [
-        # CategoricalParameter("duration_increase", ["0", "1000","2000"]),
         RealParameter("rate", 0.78, 0.94),
         CategoricalParameter("heat_pump", [True, False]),
     ]
@@ -132,15 +123,13 @@ for index, plant_data in plants_df.iterrows():
     all_outcomes.to_csv("all_outcomes.csv", index=False)
 
     if df_experiments.shape[0] == df_outcomes.shape[0]:
-        # print("The number of rows in df_experiments and df_outcomes match.")
         if all(df_experiments.index == df_outcomes.index):
-            # print("The indices of df_experiments and df_outcomes are aligned.")
             print(" ")
     else:
         print("Mismatch in the number of rows between df_experiments and df_outcomes.")
 
     df_outcomes["heat_pump"] = experiments["heat_pump"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-    # sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
+    sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
 
-# plt.show()
+plt.show()

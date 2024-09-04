@@ -1,14 +1,9 @@
 """Stuff here controller"""
 
-# import math
 import numpy as np
-# from scipy.optimize import brentq
-# from scipy.interpolate import LinearNDInterpolator
-# from ema_workbench.em_framework.evaluators import Samplers
 from chp_model import *
-import matplotlib.pyplot as plt  
-import seaborn as sns
 import pandas as pd
+import seaborn as sns
 from ema_workbench import (
     Model,
     RealParameter,
@@ -21,8 +16,6 @@ from ema_workbench import (
     ema_logging,
     perform_experiments
 )
-from ema_workbench.analysis import prim
-# from prim_constrained import *
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("CHP data all.csv",delimiter=";")
@@ -39,10 +32,8 @@ for index, plant_data in plants_df.iterrows():
     print(f"||| MODELLING {plant_data['Plant Name']} BIOMASS CHP |||")
 
     energybalance_assumptions = {
-        # "time": 5500,                    #[h/yr]
-        "U": 1500                        #[W/m2K]
+        # "U": 1500                        #[W/m2K]
         # "m_fluegas": simplified from Tharun's study
-        # "HEX costs": taken from Eliasson (2022)
     }
 
     CHP = CHP_plant(
@@ -66,6 +57,7 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("Tlow", 43, 55),       #NOTE: Consider 35C as low (Ramboll, Malmö CCS study)
         RealParameter("COP", 2.3, 3.8),
         RealParameter("dTmin", 5, 12),
+        RealParameter("U", 1300, 1700),
 
         RealParameter("alpha", 6, 7),
         RealParameter("beta", 0.6, 0.7),
@@ -132,15 +124,13 @@ for index, plant_data in plants_df.iterrows():
     all_outcomes.to_csv("all_outcomes.csv", index=False)
 
     if df_experiments.shape[0] == df_outcomes.shape[0]:
-        # print("The number of rows in df_experiments and df_outcomes match.")
         if all(df_experiments.index == df_outcomes.index):
-            # print("The indices of df_experiments and df_outcomes are aligned.")
             print(" ")
     else:
         print("Mismatch in the number of rows between df_experiments and df_outcomes.")
 
-    df_outcomes["duration_increase"] = experiments["duration_increase"]
-    # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
+#     df_outcomes["duration_increase"] = experiments["duration_increase"]
+#     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
 #     sns.pairplot(df_outcomes, hue="duration_increase", vars=["capture_cost","penalty_services","penalty_biomass"])
 
 # plt.show()
