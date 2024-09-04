@@ -1,0 +1,6 @@
+NameHere
+                    box 8
+                      min        max qp value       qp value
+BarkIncrease          0.0       30.0      NaN  2.727395e-274
+celc            20.145626  72.337647      NaN   4.655815e-82
+SupplyStrategy  {SteamLP}  {SteamLP}      0.0            NaN

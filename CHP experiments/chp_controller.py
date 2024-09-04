@@ -25,8 +25,8 @@ from ema_workbench.analysis import prim
 # from prim_constrained import *
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
-plants_df = pd.read_csv("CHP data.csv",delimiter=";")
-plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
+plants_df = pd.read_csv("CHP data all.csv",delimiter=";")
+# plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
 all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
 
@@ -39,7 +39,7 @@ for index, plant_data in plants_df.iterrows():
     print(f"||| MODELLING {plant_data['Plant Name']} BIOMASS CHP |||")
 
     energybalance_assumptions = {
-        "time": 5500,                    #[h/yr]
+        # "time": 5500,                    #[h/yr]
         "U": 1500                        #[W/m2K]
         # "m_fluegas": simplified from Tharun's study
         # "HEX costs": taken from Eliasson (2022)
@@ -63,7 +63,7 @@ for index, plant_data in plants_df.iterrows():
     model.uncertainties = [
         RealParameter("dTreb", 7, 14),       #[tCO2/MWh]
         RealParameter("Tsupp", 78, 100),
-        RealParameter("Tlow", 43, 55),       #[kg/t]
+        RealParameter("Tlow", 43, 55),       #NOTE: Consider 35C as low (Ramboll, Malmö CCS study)
         RealParameter("COP", 2.3, 3.8),
         RealParameter("dTmin", 5, 12),
 
@@ -72,7 +72,7 @@ for index, plant_data in plants_df.iterrows():
         RealParameter("CEPCI", 1.0, 1.2),
         RealParameter("fixed", 0.04, 0.08),
         RealParameter("ownercost", 0.1, 0.4),
-        RealParameter("WACC", 0.03, 0.09),
+        RealParameter("WACC", 0.03, 0.09), # REF https://iopscience.iop.org/article/10.1088/1748-9326/aa67a5/meta Dowell, Inefficient BECCS
         IntegerParameter("yexpenses", 2, 6),
         RealParameter("rescalation", 0.02, 0.06),
         RealParameter("i", 0.05, 0.11),
@@ -104,8 +104,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 150
-    n_policies = 15
+    n_scenarios = 250
+    n_policies = 40
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results
@@ -113,8 +113,9 @@ for index, plant_data in plants_df.iterrows():
     # ---------------------------------------- Process results  ---------------------------------------------
     df_experiments = pd.DataFrame(experiments)
     df_experiments["Name"] = CHP.name
-    # df_experiments.to_csv("experiments.csv", index=False) 
+    
     all_experiments = pd.concat([all_experiments, df_experiments], ignore_index=True)
+    all_experiments.to_csv("all_experiments.csv", index=False) 
 
     processed_outcomes = {} # Multi-dimensional outcomes need to be put into neat columns
     for k, v in outcomes.items():
@@ -124,72 +125,22 @@ for index, plant_data in plants_df.iterrows():
         else:
             processed_outcomes[k] = v
 
-    # df_outcomes = pd.DataFrame(outcomes)
     df_outcomes = pd.DataFrame(processed_outcomes)
     df_outcomes["Name"] = CHP.name
-    # df_outcomes.to_csv("outcomes.csv", index=False)
-    all_outcomes = pd.concat([all_outcomes, df_outcomes], ignore_index=True)
 
-    # Sanity check to ensure the indices are aligned
+    all_outcomes = pd.concat([all_outcomes, df_outcomes], ignore_index=True)
+    all_outcomes.to_csv("all_outcomes.csv", index=False)
+
     if df_experiments.shape[0] == df_outcomes.shape[0]:
-        print("The number of rows in df_experiments and df_outcomes match.")
+        # print("The number of rows in df_experiments and df_outcomes match.")
         if all(df_experiments.index == df_outcomes.index):
-            print("The indices of df_experiments and df_outcomes are aligned.")
+            # print("The indices of df_experiments and df_outcomes are aligned.")
+            print(" ")
     else:
         print("Mismatch in the number of rows between df_experiments and df_outcomes.")
 
     df_outcomes["duration_increase"] = experiments["duration_increase"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-    sns.pairplot(df_outcomes, hue="duration_increase", vars=["capture_cost","penalty_services","penalty_biomass"])
+#     sns.pairplot(df_outcomes, hue="duration_increase", vars=["capture_cost","penalty_services","penalty_biomass"])
 
-# Launching PRIM algorithm
-# zero_biomass_boolean = (df_experiments["BarkIncrease"] == "0")
-y = df_outcomes["capture_cost"] < 10
-# y = df_outcomes["penalty_services"]<300 
-# y = df_outcomes["penalty_biomass"]==0 
-# y = (df_outcomes["capture_cost"] < 90) & (df_outcomes["penalty_services"] < 600) & (df_outcomes["penalty_biomass"] < 220)
-# y = (all_outcomes["capture_cost"] < 100) & (all_outcomes["penalty_services"] < 500) 
-
-x = all_experiments.iloc[:, 0:23]
-print("The number of interesting cases are:\n", y.value_counts())
-
-# Data = PrimedData(x,y)
-# peeling_trajectory = []
-# box = Box(id=0)
-# box.calculate(Data)
-
-# print(" ISSUE: MY PRIM ALGORITHM DOES NOT RECOGNIZE CATEGORICAL FEATURES; THAT'S WHY IT'S WORSE. MAYBE ADJUST IT AND HARD-CODE WHAT IS CATEGORICAL OR NOT, AS AN ARGUMENT")
-# peeling_trajectory = prim_recursive(Data,box,peeling_trajectory,max_iterations=40, constrained_to=None, objective_function="LENIENT2")
-# # peeling_trajectory = prim_recursive(Data,box,peeling_trajectory,max_iterations=40, constrained_to=["Cellulosic cost", "Biomass backstop price", "Pricing"], objective_function="LENIENT2")
-# peeling_trajectory[7].print_info()
-# peeling_trajectory[19].print_info()
-
-# x_values = [box.coverage for box in peeling_trajectory]
-# y_values = [box.density for box in peeling_trajectory]
-# colors = [box.n_lims for box in peeling_trajectory]
-# colors = np.array(colors, dtype=int)
-# num_colors = len(set(colors))
-# cmap = plt.cm.get_cmap('tab10', num_colors)
-# plt.scatter(x_values, y_values, c=colors, cmap=cmap, alpha=0.8)
-# plt.xlabel('Coverage')
-# plt.ylabel('Density')
-# plt.colorbar(label='Number of Limits')
-
-
-prim_alg = prim.Prim(x, y, threshold=0.6, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
-box1 = prim_alg.find_box()
-
-# plt.clf()
-box1.show_ppt()             # Lines tradeoff
-box1.show_tradeoff()        # Pareto tradeoff 
-box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
-
-box1.select(14)
-# box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
-prim_alg.show_boxes(14) 
-prim_alg.boxes_to_dataframe() # Save boxes here?
-box1.inspect(14)
-
-all_experiments.to_csv("all_experiments.csv", index=False)
-all_outcomes.to_csv("all_outcomes.csv", index=False)
-plt.show()
+# plt.show()

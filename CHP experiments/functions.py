@@ -193,7 +193,8 @@ class CHP_plant:
         if a.p > B.p: # Check Rankine plots, the new power output depends on the pressures of pDH and pCCS
             Pnew = mtot*(A.h-a.h) + mB*(a.h-B.h) - W #Subtract pump, comp work etc.
         else: 
-            Pnew = mtot*(A.h-B.h) + mCCS*(B.h-a.h) - W
+            # Pnew = mtot*(A.h-B.h) + mCCS*(B.h-a.h) - W
+            Pnew = mtot*(A.h-B.h) - W # No extra turbine below B!
 
         Plost = (mtot*(A.h-B.h) - Pnew)/1000
         self.P = Pnew/1000

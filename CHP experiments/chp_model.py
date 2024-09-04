@@ -294,14 +294,16 @@ class CHP_plant:
             else:
                 return x1 + (x2 - x1) * (ynew - y1) / (y2 - y1)
         
-        Qsupp = linear_interpolation(curve, Tsupp)
+        Qsupp = linear_interpolation(curve, 86) # BUG: Hard-coded Tsupp=86C since higher temp. heat won't be available
         Qlow = linear_interpolation(curve, Tlow)
         Qpinch, Tpinch = curve[max_curvature_index][0], curve[max_curvature_index][1]
         if Qlow < Qpinch:
             Qlow = Qpinch # Sometimes Qlow is poorly estimated, then just set the low grade heat to zero
         Qhex = (Qpinch-Qsupp) + (Qlow-Qpinch)
 
-        Qhp = composite_curve[-1][0] - Qlow
+        # Qhp = composite_curve[-1][0] - Qlow # BUG: This overestimates Qhp for smaller plants where the composite curve is less accurate
+        Qmax_beiron = self.get("Qreb")*1.18 # Assumptions from (Beiron, 2022)
+        Qhp = Qmax_beiron - Qlow
         if not self.technology_assumptions["heat_pump"]:
             Qhp = 0
         Php = Qhp/self.technology_assumptions["COP"]
