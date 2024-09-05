@@ -3,7 +3,7 @@ WHAT I NEED TO DO TO FINISH THE MODELLING
 1) Skim through how each model calculates things. Am I happy with this? For:
     a) CHP      -y
     b) Waste    -y
-    c) Pulp
+    c) Pulp     -y
 
 2) Look through Tables 3-4 and decide on each range. Include a reference/motivation.
 
@@ -12,7 +12,7 @@ WHAT I NEED TO DO TO FINISH THE MODELLING
     b) Waste
     c) Pulp
 
-3.2) Redo these quicker tests but when Pheat < Pelc. Does PRIM find (good) scenarios still? For:
+3.2) [OUTDATED, NEW ENERGY LOGIC] Redo these quicker tests but when Pheat < Pelc. Does PRIM find (good) scenarios still? For:
     a) CHP
     b) Waste
     c) Pulp

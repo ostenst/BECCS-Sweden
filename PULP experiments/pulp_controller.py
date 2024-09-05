@@ -1,10 +1,5 @@
 """Stuff here controller"""
 
-# import math
-# import numpy as np
-# from scipy.optimize import brentq
-# from scipy.interpolate import LinearNDInterpolator
-# from ema_workbench.em_framework.evaluators import Samplers
 from pulp_model import *
 import matplotlib.pyplot as plt  
 import seaborn as sns
@@ -21,7 +16,6 @@ from ema_workbench import (
     ema_logging,
     perform_experiments
 )
-from ema_workbench.analysis import prim
 
 # -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("Pulp data.csv",delimiter=";")
@@ -39,7 +33,7 @@ for index, plant_data in plants_df.iterrows():
         "heat_intensity": 11,           #[GJ/t]
         "electricity_intensity": 0.7,   #[MWh/t]
         "condensing_pressure": 0.1,     #[bar]
-        "time": 8000                    #[h/yr]
+        "time": 8000                    #[h/yr] NOTE: This cannot be an uncertainty as we are hard-coding the pulp capacities [t/yr], and this capacity determines A LOT!
     }
 
     pulp_plant = PulpPlant(
@@ -133,7 +127,7 @@ for index, plant_data in plants_df.iterrows():
     else:
         print("Mismatch in the number of rows between df_experiments and df_outcomes.")
 
-    df_outcomes["SupplyStrategy"] = experiments["SupplyStrategy"]
+    # df_outcomes["SupplyStrategy"] = experiments["SupplyStrategy"]
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=["capture_cost","penalty_services","penalty_biomass"])
 

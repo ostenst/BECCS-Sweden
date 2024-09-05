@@ -577,4 +577,4 @@ if __name__ == "__main__":
     capture_cost, penalty_services, penalty_biomass, costs, emissions = CCS_CHP(CHP=CHP, chp_interpolators=aspen_interpolators)
     print("Outcomes: ", capture_cost, penalty_services, penalty_biomass, costs, emissions)
 
-    plt.show()
+    # plt.show()

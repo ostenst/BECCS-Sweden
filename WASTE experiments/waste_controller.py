@@ -128,8 +128,8 @@ for index, plant_data in plants_df.iterrows():
     else:
         print("Mismatch in the number of rows between df_experiments and df_outcomes.")
 
-    df_outcomes["heat_pump"] = experiments["heat_pump"]
-    # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
-    sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
+#     df_outcomes["heat_pump"] = experiments["heat_pump"]
+#     # sns.pairplot(df_outcomes, hue="SupplyStrategy", vars=list(outcomes.keys())) # This plots ALL outcomes
+#     sns.pairplot(df_outcomes, hue="heat_pump", vars=["capture_cost","penalty_services","penalty_biomass"])
 
-plt.show()
+# plt.show()
