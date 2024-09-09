@@ -20,6 +20,8 @@ from ema_workbench import (
 # -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("CHP data all.csv",delimiter=";")
 # plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
+# plants_df = plants_df.iloc[:3] # This row makes us only iterate over the 4 first plant
+
 all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
 
@@ -52,29 +54,29 @@ for index, plant_data in plants_df.iterrows():
     # ----------------------------------------- Begin RDM analysis  ---------------------------------------------
     model = Model("CCSproblem", function=CCS_CHP)
     model.uncertainties = [
-        RealParameter("dTreb", 7, 14),       #[tCO2/MWh]
+        RealParameter("dTreb", 7, 14),       
         RealParameter("Tsupp", 78, 100),
-        RealParameter("Tlow", 43, 55),       #NOTE: Consider 35C as low (Ramboll, Malmö CCS study)
-        RealParameter("COP", 2.3, 3.8),
-        RealParameter("dTmin", 5, 12),
+        RealParameter("Tlow", 43, 55),
+        RealParameter("dTmin", 5, 12),       
         RealParameter("U", 1300, 1700),
+        RealParameter("COP", 2.3, 3.8),
 
         RealParameter("alpha", 6, 7),
         RealParameter("beta", 0.6, 0.7),
-        RealParameter("CEPCI", 1.0, 1.2),
+        RealParameter("CEPCI", 1.386, 1.57), #NOTE: Indices of 780 to 830 in 2026 yield 1.386 and 1.57 (comparing with index of 541 in the reference year 2016 (choosing ref year based on CAPEX function)) 
         RealParameter("fixed", 0.04, 0.08),
-        RealParameter("ownercost", 0.1, 0.4),
-        RealParameter("WACC", 0.03, 0.09), # REF https://iopscience.iop.org/article/10.1088/1748-9326/aa67a5/meta Dowell, Inefficient BECCS
-        IntegerParameter("yexpenses", 2, 6),
-        RealParameter("rescalation", 0.02, 0.06),
-        RealParameter("i", 0.05, 0.11),
+        RealParameter("ownercost", 0.1, 0.3),
+        RealParameter("WACC", 0.03, 0.09),
+        IntegerParameter("yexpenses", 3, 6),
+        RealParameter("rescalation", 0.00, 0.06),
+        RealParameter("i", 0.05, 0.12),
         IntegerParameter("t", 20, 30),
-        RealParameter("celc", 20, 100),
-        RealParameter("cheat", 30, 150),        
-        RealParameter("cbio", 30, 60),
+        RealParameter("celc", 20, 160),
+        RealParameter("cheat", 0.25, 1.00), #NOTE: a percentage of celc
+        RealParameter("cbio", 15, 60),
         RealParameter("cMEA", 1.5, 2.5),
         RealParameter("cHP", 0.76, 0.96),
-        RealParameter("cHEX", 0.500, 0.600),  
+        RealParameter("cHEX", 0.470, 0.670),  
 
         RealParameter("time", 4000, 6000),
     ]
@@ -96,8 +98,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 250
-    n_policies = 40
+    n_scenarios = 150
+    n_policies = 20
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results

@@ -362,16 +362,17 @@ class W2E_plant:
         X = economic_assumptions
         duration = X["time"]
         duration_increase = self.technology_assumptions["duration_increase"] 
+        cheat = X["cheat"] * X["celc"]
 
         # The annual energy revenues used to be this:
         cash_power = (self.P + self.results["Plost"])*duration * X["celc"]                  #[EUR/yr]
-        cash_heat  = (self.Qdh + self.results["Qlost"] + self.Qfgc)*duration * X["cheat"]
+        cash_heat  = (self.Qdh + self.results["Qlost"] + self.Qfgc)*duration * cheat
         cost_fuel = self.Qfuel*duration * X["cbio"]
         revenues_nominal = cash_power+cash_heat-cost_fuel
 
         # The annual energy revenues are now this:
         cash_power = self.P*(duration + duration_increase) * X["celc"]                      #[EUR/yr]  
-        cash_heat = (self.Qdh + self.Qfgc)*(duration + duration_increase) * X["cheat"]
+        cash_heat = (self.Qdh + self.Qfgc)*(duration + duration_increase) * cheat
         cost_fuel = self.Qfuel*(duration + duration_increase) * X["cbio"]
         revenues = cash_power+cash_heat-cost_fuel
 
@@ -447,7 +448,7 @@ def CCS_CHP(
     i=0.075,
     t=25,
     celc=40,
-    cheat=40,
+    cheat=0.80,
     cbio=99999999,
     cMEA=2,
     cHP=0.86,                       #(Bergander & Hellander, 2024)
@@ -467,10 +468,8 @@ def CCS_CHP(
         'U': U,
         "time": time,
         "duration_increase": 0,         # This is the main difference compared to wood chip fired CHP
-        # "HEX_optimization": int(HEX_optimization),
         "rate": rate,
         "heat_pump": heat_pump,
-        # "eta_boiler": eta_boiler,
         "dTreb": dTreb,
         "Tsupp": Tsupp,
         "Tlow": Tlow,

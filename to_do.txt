@@ -5,10 +5,10 @@ WHAT I NEED TO DO TO FINISH THE MODELLING
     b) Waste    -y
     c) Pulp     -y
 
-2) Look through Tables 3-4 and decide on each range. Include a reference/motivation.
+2) Look through Tables 3-4 and decide on each range. Include a reference/motivation.    -y
 
 3.1) Test the models for fewer scenarios. Also run PRIM on each. Are the results ok? For:
-    a) CHP
+    a) CHP          - NOT OKAY RESULTS RIGHT NOW, ITERATIVELY PLOT AND ADJUST!
     b) Waste
     c) Pulp
 

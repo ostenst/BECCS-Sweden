@@ -362,16 +362,17 @@ class CHP_plant:
         X = economic_assumptions
         duration = X["time"]
         duration_increase = self.technology_assumptions["duration_increase"] 
+        cheat = X["cheat"] * X["celc"]
 
         # The annual energy revenues used to be this:
         cash_power = (self.P + self.results["Plost"])*duration * X["celc"]                  #[EUR/yr]
-        cash_heat  = (self.Qdh + self.results["Qlost"] + self.Qfgc)*duration * X["cheat"]
+        cash_heat  = (self.Qdh + self.results["Qlost"] + self.Qfgc)*duration * cheat
         cost_fuel = self.Qfuel*duration * X["cbio"]
         revenues_nominal = cash_power+cash_heat-cost_fuel
 
         # The annual energy revenues are now this:
         cash_power = self.P*(duration + duration_increase) * X["celc"]                      #[EUR/yr]  
-        cash_heat = (self.Qdh + self.Qfgc)*(duration + duration_increase) * X["cheat"]
+        cash_heat = (self.Qdh + self.Qfgc)*(duration + duration_increase) * cheat
         cost_fuel = self.Qfuel*(duration + duration_increase) * X["cbio"]
         revenues = cash_power+cash_heat-cost_fuel
 
@@ -447,16 +448,15 @@ def CCS_CHP(
     i=0.075,
     t=25,
     celc=40,
-    cheat=40,
+    cheat=0.80,
     cbio=30,
     cMEA=2,
-    cHP=0.86,                       #(Bergander & Hellander, 2024)
-    cHEX=0.571,                     # check units in (Eliasson, 2022)
+    cHP=0.86,                       
+    cHEX=0.571,                     
     
     time=5000,
 
     duration_increase="1000",       #[h/yr]
-    # HEX_optimization="100",         #[% of optimal] everybody optimizes this, no reason to include!
     rate=0.90,
     heat_pump=True,
 

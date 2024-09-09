@@ -219,7 +219,7 @@ categorical_restrictions = {
     # "duration_increase": [1000]
 }
 satisficing_thresholds_1 = {
-    'capture_cost': 100,
+    'capture_cost': 120,
     'penalty_services': 300,
     'penalty_biomass': 500
 }
@@ -256,7 +256,7 @@ filtered_outcomes_low = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 
 # # plot_everything(filtered_experiments, filtered_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
-# plot_everything(chp_experiments, chp_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
+plot_everything(chp_experiments, chp_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
 # plot_everything(w2e_experiments, w2e_outcomes, w2e_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_2)
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
