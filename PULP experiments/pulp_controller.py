@@ -56,25 +56,25 @@ for index, plant_data in plants_df.iterrows():
     # ----------------------------------------- Begin RDM analysis  ---------------------------------------------
     model = Model("CCSproblem", function=CCS_Pulp)
     model.uncertainties = [
-        RealParameter("factor_recovery", 0.39, 0.42),       #[tCO2/MWh]
-        RealParameter("factor_bark", 0.30, 0.33),
+        RealParameter("factor_recovery", 0.38, 0.43),       #[tCO2/MWh]
+        RealParameter("factor_bark", 0.29, 0.34),
         RealParameter("fluegas_intensity", 10000, 11000),   #[kg/t]
         RealParameter("COP", 2.3, 3.8),
-        RealParameter("k", -32, -28),
-        RealParameter("m", 1.0, 1.5),
+        RealParameter("k", -217, 157),
+        RealParameter("m", 0.918, 1.578),
 
         RealParameter("alpha", 6, 7),
         RealParameter("beta", 0.6, 0.7),
-        RealParameter("CEPCI", 1.0, 1.2),
+        RealParameter("CEPCI", 1.38, 1.57),
         RealParameter("fixed", 0.04, 0.08),
-        RealParameter("ownercost", 0.1, 0.4),
+        RealParameter("ownercost", 0.1, 0.3),
         RealParameter("WACC", 0.03, 0.09),
-        IntegerParameter("yexpenses", 2, 6),
-        RealParameter("rescalation", 0.02, 0.06),
-        RealParameter("i", 0.05, 0.11),
+        IntegerParameter("yexpenses", 3, 6),
+        RealParameter("rescalation", 0.00, 0.06),
+        RealParameter("i", 0.05, 0.12),
         IntegerParameter("t", 20, 30),
-        RealParameter("celc", 20, 100),
-        RealParameter("cbio", 30, 150),
+        RealParameter("celc", 20, 160),
+        RealParameter("cbio", 15, 60),
         RealParameter("cMEA", 1.5, 2.5),
         RealParameter("cHP", 0.76, 0.96), 
     ]
