@@ -13,10 +13,10 @@ pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 
 # If you want a specific plant
-# pulp_experiments = pulp_experiments[ (pulp_experiments["Name"] == "Varo") ].reset_index(drop=True)
-# pulp_outcomes = pulp_outcomes[ (pulp_outcomes["Name"] == "Varo") ].reset_index(drop=True)
-chp_experiments = chp_experiments[ (chp_experiments["Name"] == "Igelsta KVV") ].reset_index(drop=True)
-chp_outcomes = chp_outcomes[ (chp_outcomes["Name"] == "Igelsta KVV") ].reset_index(drop=True)
+# # pulp_experiments = pulp_experiments[ (pulp_experiments["Name"] == "Varo") ].reset_index(drop=True)
+# # pulp_outcomes = pulp_outcomes[ (pulp_outcomes["Name"] == "Varo") ].reset_index(drop=True)
+# chp_experiments = chp_experiments[ (chp_experiments["Name"] == "Igelsta KVV") ].reset_index(drop=True)
+# chp_outcomes = chp_outcomes[ (chp_outcomes["Name"] == "Igelsta KVV") ].reset_index(drop=True)
 
 # # If you want only zero biomass scenarios
 # zero_biomass_boolean = (pulp_experiments["BarkIncrease"] == 0)
@@ -27,16 +27,16 @@ chp_outcomes = chp_outcomes[ (chp_outcomes["Name"] == "Igelsta KVV") ].reset_ind
 #Figure out what plants have above 300 kt/yr
 grouped = chp_outcomes.groupby('Name')
 gross_means = grouped['gross'].mean().sort_values()
-high_gross_names = gross_means[(gross_means > 300)].index.tolist()
+high_gross_names = gross_means[(gross_means < 200)].index.tolist()
+# high_gross_names = gross_means[(gross_means < 300) & (gross_means > 200)].index.tolist()
 boolean = chp_outcomes['Name'].isin(high_gross_names)
 filtered_outcomes = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments = chp_experiments[boolean].reset_index(drop=True)
 
 # Define X and Y
 x = filtered_experiments.iloc[:, 0:27]
-y = (filtered_outcomes["capture_cost"] < 140) & (filtered_outcomes["penalty_services"] < 500) & (filtered_outcomes["penalty_biomass"] < 300)
+y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 300) & (filtered_outcomes["penalty_biomass"] < 500)
 print(y.sum(),"scenarios are satisficing out of", len(y))
-
 
 prim_alg = prim.Prim(x, y, threshold=0.5, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
 box1 = prim_alg.find_box()
@@ -44,9 +44,9 @@ box1 = prim_alg.find_box()
 box1.show_tradeoff()        # Pareto tradeoff 
 box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
 
-box1.select(4)
+box1.select(6)
 # box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
-prim_alg.show_boxes(4) 
-box1.inspect(4)
+prim_alg.show_boxes(6) 
+box1.inspect(6)
 
 plt.show()

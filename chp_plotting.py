@@ -265,36 +265,36 @@ numerical_restrictions_1 = {
     # # 'Tlow': (43, 50.7),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
-    # 'time': (4387, 5999),
+    'time': (4692, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
-    # "heat_pump": [True],
-    # "duration_increase": [0]
+    "heat_pump": [True],
+    "duration_increase": [1000]
 }
 numerical_restrictions_2 = {
     # 'COP': (2.45, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.10),
-    # 'time': (4200, 5999),
+    'time': (4539, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
-    # "heat_pump": [True],
-    # "duration_increase": [0]
+    "heat_pump": [True],
+    "duration_increase": [1000]
 }
 numerical_restrictions_3 = {
     # 'COP': (2.45, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.10),
-    # 'time': (4202, 5999),
+    'time': (4540, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
-    # "heat_pump": [True],
-    # "duration_increase": [0]
+    "heat_pump": [True],
+    "duration_increase": [1000]
 }
 
 subsets = [[filtered_experiments_high,filtered_outcomes_high,numerical_restrictions_1,categorical_restrictions_1],

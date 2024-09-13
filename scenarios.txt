@@ -1,6 +1,21 @@
-NameHere
-                    box 8
-                      min        max qp value       qp value
-BarkIncrease          0.0       30.0      NaN  2.727395e-274
-celc            20.145626  72.337647      NaN   4.655815e-82
-SupplyStrategy  {SteamLP}  {SteamLP}      0.0            NaN
+Plants above 300kt
+CHP1
+                         box 7
+                           min          max       qp value       qp value
+duration_increase       1000.0       1000.0  5.596826e-134  9.158181e-171
+heat_pump               {True}       {True}  6.966430e-111            NaN
+time               4692.553052  5996.392208   7.085417e-63            NaN
+Plants between 200-300kt
+CHP2
+                         box 6
+                           min          max       qp value       qp value
+duration_increase       1000.0       1000.0  1.479772e-244  1.380225e-306
+heat_pump               {True}       {True}  1.667303e-101            NaN
+time               4539.922962  5997.172835   1.396877e-52            NaN
+Plants below 200kt
+CHP3
+                         box 6
+                           min          max       qp value qp value
+heat_pump               {True}       {True}   0.000000e+00      NaN
+duration_increase         1000         1000   0.000000e+00      0.0
+time               4540.717407  5999.593822  1.893169e-219      NaN
