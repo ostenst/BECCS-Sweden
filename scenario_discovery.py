@@ -35,6 +35,8 @@ filtered_experiments = chp_experiments[boolean].reset_index(drop=True)
 
 # Define X and Y
 x = filtered_experiments.iloc[:, 0:27]
+names_list = ['duration_increase', 'heat_pump', 'time']  # This is essentially "constrained PRIM"
+x = x[names_list]
 y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 300) & (filtered_outcomes["penalty_biomass"] < 500)
 print(y.sum(),"scenarios are satisficing out of", len(y))
 
@@ -44,9 +46,9 @@ box1 = prim_alg.find_box()
 box1.show_tradeoff()        # Pareto tradeoff 
 box1.write_ppt_to_stdout()  # Prints trajectory/tradeoff, useful!
 
-box1.select(6)
+box1.select(14)
 # box1.inspect_tradeoff()     # Print tradeoff to terminal, not useful?
-prim_alg.show_boxes(6) 
-box1.inspect(6)
+prim_alg.show_boxes(14) 
+box1.inspect(14)
 
 plt.show()

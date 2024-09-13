@@ -265,7 +265,7 @@ numerical_restrictions_1 = {
     # # 'Tlow': (43, 50.7),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
-    'time': (4692, 5999),
+    'time': (5375, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
@@ -277,7 +277,7 @@ numerical_restrictions_2 = {
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.10),
-    'time': (4539, 5999),
+    'time': (5227, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
@@ -289,7 +289,7 @@ numerical_restrictions_3 = {
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.10),
-    'time': (4540, 5999),
+    'time': (5373, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
