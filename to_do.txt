@@ -10,7 +10,7 @@ WHAT I NEED TO DO TO FINISH THE MODELLING
 3.1) Test the models for fewer scenarios. Also run PRIM on each. Are the results ok? For:
     a) CHP          - y
     b) Waste        - y
-    c) Pulp
+    c) Pulp         - y
 
 4) Create Aspen data and redo the tests. Are the PRIM scenarios the same? For:
     a) Pulp

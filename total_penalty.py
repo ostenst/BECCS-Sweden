@@ -246,28 +246,27 @@ pulp_coordinates = pd.read_csv('pulp_coordinates.csv')
 
 numerical_restrictions_1 = {
     # 'COP': (3.28, 3.80),
-    'celc': (20, 72),
-    # 'CEPCI': (1, 1.16),
-    'BarkIncrease': (None, 31), #should be zero, but maybe use this just for plotting
+    'celc': (20, 68),
+    'rate': (0.86, 0.93),
 }
 categorical_restrictions_1 = {
-    "SupplyStrategy": ["SteamLP"],
-    # "BarkIncrease": [0]
+    "SupplyStrategy": ["SteamLP", "SteamHP"],
+    "BarkIncrease": [0]
 }
 
 numerical_restrictions_2 = {
-    # 'beta': (0.6, 0.67),
-    'celc': (20, 62),
-    'BarkIncrease': (None, 31), #should be zero, but maybe use this just for plotting
+    'beta': (0.6, 0.66),
+    'celc': (20, 46),
+    # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_2 = {
-    "SupplyStrategy": ["SteamLP"],
-    # "BarkIncrease": [0]
+    "SupplyStrategy": ["HeatPumps", "SteamLP"],
+    "BarkIncrease": [0]
 }
 
 numerical_restrictions_3 = {
-    # 'beta': (0.6, 0.68),
-    'celc': (20, 84),
+    'beta': (0.6, 0.69),
+    'celc': (20, 50),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_3 = {
@@ -276,8 +275,8 @@ categorical_restrictions_3 = {
 }
 
 numerical_restrictions_4 = {
-    'COP': (2.83, 3.80),
-    'celc': (20, 63),
+    'k': (-138, 156),
+    'celc': (20, 49),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_4 = {
@@ -286,18 +285,18 @@ categorical_restrictions_4 = {
 }
 
 numerical_restrictions_5 = {
-    'COP': (3.1, 3.80),
-    'celc': (20, 84),
+    'i': (0.05, 0.11),
+    'celc': (24, 62),
     # 'BarkIncrease': (None, 61),
 }
 categorical_restrictions_5 = {
-    "SupplyStrategy": ["HeatPumps"],
+    "SupplyStrategy": ["SteamLP"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_6 = {
-    # 'rate': (0.82, 0.92),
-    'celc': (20, 92),
+    'beta': (0.6, 0.66),
+    'celc': (20, 68),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_6 = {
@@ -306,8 +305,8 @@ categorical_restrictions_6 = {
 }
 
 numerical_restrictions_7 = {
-    # 'rate': (0.79, 0.92),
-    'celc': (20, 78),
+    'rate': (0.82, 0.85),
+    'celc': (20, 68),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_7 = {

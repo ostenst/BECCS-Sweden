@@ -268,7 +268,7 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # # BELOW IS FOR REGULAR SCENARIO
 # numerical_restrictions_1 = {
 #     # 'COP': (3.28, 3.80),
-#     'celc': (20, 72),
+#     'celc': (20, 68),
 #     # 'rate': (0.78, 0.893),
 # }
 # categorical_restrictions_1 = {
@@ -278,7 +278,7 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 
 # numerical_restrictions_2 = {
 #     # 'COP': (3.28, 3.80),
-#     'celc': (20, 92),
+#     'celc': (20, 58),
 #     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_2 = {
@@ -287,8 +287,8 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # }
 
 # numerical_restrictions_3 = {
-#     # 'COP': (3.28, 3.80),
-#     'celc': (20, 84),
+#     'rate': (0.82, 0.90),
+#     # 'celc': (20, 84),
 #     # 'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_3 = {
@@ -297,8 +297,8 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # }
 
 # numerical_restrictions_4 = {
-#     'COP': (2.83, 3.80),
-#     'celc': (20, 63),
+#     'COP': (2.97, 3.80),
+#     'celc': (34, 75),
 #     # 'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_4 = {
@@ -307,18 +307,19 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # }
 
 # numerical_restrictions_5 = {
-#     'COP': (2.9, 3.80),
+#     # 'COP': (2.9, 3.80),
 #     # 'rate': (0.80, 94),
-#     'celc': (20, 78),
+#     'celc': (20, 58),
+#     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_5 = {
-#     "SupplyStrategy": ["HeatPumps"],
+#     "SupplyStrategy": ["HeatPumps", "SteamLP"],
 #     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_6 = {
 #     # 'COP': (3.28, 3.80),
-#     'celc': (20, 67),
+#     'celc': (20, 58),
 #     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_6 = {
@@ -328,7 +329,7 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 
 # numerical_restrictions_7 = {
 #     # 'COP': (3.28, 3.80),
-#     'celc': (20, 73),
+#     'celc': (20, 63),
 #     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_7 = {
@@ -339,27 +340,27 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # BELOW ARE ZERO BIOMASS SCENARIOS
 numerical_restrictions_1 = {
     # 'COP': (3.28, 3.80),
-    'celc': (20, 72),
-    'CEPCI': (1, 1.16),
+    'celc': (20, 68),
+    'rate': (0.86, 0.93),
 }
 categorical_restrictions_1 = {
-    "SupplyStrategy": ["SteamLP"],
+    "SupplyStrategy": ["SteamLP", "SteamHP"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_2 = {
-    'beta': (0.6, 0.67),
-    'celc': (20, 62),
+    'beta': (0.6, 0.66),
+    'celc': (20, 46),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_2 = {
-    "SupplyStrategy": ["SteamLP"],
+    "SupplyStrategy": ["HeatPumps", "SteamLP"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_3 = {
-    'beta': (0.6, 0.68),
-    'celc': (20, 84),
+    'beta': (0.6, 0.69),
+    'celc': (20, 50),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_3 = {
@@ -368,8 +369,8 @@ categorical_restrictions_3 = {
 }
 
 numerical_restrictions_4 = {
-    'COP': (2.83, 3.80),
-    'celc': (20, 63),
+    'k': (-138, 156),
+    'celc': (20, 49),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_4 = {
@@ -378,18 +379,18 @@ categorical_restrictions_4 = {
 }
 
 numerical_restrictions_5 = {
-    'COP': (3.1, 3.80),
-    'celc': (20, 84),
+    'i': (0.05, 0.11),
+    'celc': (24, 62),
     # 'BarkIncrease': (None, 61),
 }
 categorical_restrictions_5 = {
-    "SupplyStrategy": ["HeatPumps"],
+    "SupplyStrategy": ["SteamLP"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_6 = {
-    'rate': (0.82, 0.92),
-    'celc': (20, 92),
+    'beta': (0.6, 0.66),
+    'celc': (20, 68),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_6 = {
@@ -398,8 +399,8 @@ categorical_restrictions_6 = {
 }
 
 numerical_restrictions_7 = {
-    'rate': (0.79, 0.92),
-    'celc': (20, 78),
+    'rate': (0.82, 0.85),
+    'celc': (20, 68),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_7 = {
@@ -418,9 +419,9 @@ restrictions = [            [numerical_restrictions_1, categorical_restrictions_
 separate_mills = []
 for idx, Name in enumerate(pulp_coordinates["Name"]):
     pulp_experiments_subset = pulp_experiments[pulp_experiments["Name"] == Name].reset_index(drop=True)
-    print(pulp_experiments_subset) # This should print correctly for all iterations
+    # print(pulp_experiments_subset) # This should print correctly for all iterations
     pulp_outcomes_subset = pulp_outcomes[pulp_outcomes["Name"] == Name].reset_index(drop=True)
-    print(restrictions[idx][0])
+    # print(restrictions[idx][0])
     separate_mills.append([pulp_experiments_subset, pulp_outcomes_subset, restrictions[idx][0], restrictions[idx][1]])
 
 # Now process each subset
