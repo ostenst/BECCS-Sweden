@@ -8,13 +8,8 @@ WHAT I NEED TO DO TO FINISH THE MODELLING
 2) Look through Tables 3-4 and decide on each range. Include a reference/motivation.    -y
 
 3.1) Test the models for fewer scenarios. Also run PRIM on each. Are the results ok? For:
-    a) CHP          - NOT OKAY RESULTS RIGHT NOW, ITERATIVELY PLOT AND ADJUST!
-    b) Waste
-    c) Pulp
-
-3.2) [OUTDATED, NEW ENERGY LOGIC] Redo these quicker tests but when Pheat < Pelc. Does PRIM find (good) scenarios still? For:
-    a) CHP
-    b) Waste
+    a) CHP          - y
+    b) Waste        - y
     c) Pulp
 
 4) Create Aspen data and redo the tests. Are the PRIM scenarios the same? For:

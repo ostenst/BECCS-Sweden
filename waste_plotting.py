@@ -227,8 +227,8 @@ categorical_restrictions = {
 #     'penalty_biomass': 500
 # }
 satisficing_thresholds_2 = {
-    'capture_cost': 100,
-    'penalty_services': 300,
+    'capture_cost': 120,
+    'penalty_services': 350,
     'penalty_biomass': 1
 }
 # satisficing_thresholds_3 = {
@@ -264,39 +264,39 @@ filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
-    'COP': (3.28, 3.80),
-    'celc': (20, 90),
+    # 'COP': (3, 3.80),
+    # 'celc': (20, 80),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
     # 'time': (4400, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
-    "heat_pump": [True],
+    # "heat_pump": [True],
     # "duration_increase": [0]
 }
 numerical_restrictions_2 = {
-    'COP': (3, 3.80),
-    'celc': (20, 85),
+    # 'COP': (3, 3.80),
+    # 'celc': (20, 74),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.10),
+    # 'i': (0.05, 0.08),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
-    "heat_pump": [True],
+    # "heat_pump": [True],
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'COP': (2.6, 3.80),
+    # 'celc': (20, 73),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.10),
+    # 'i': (0.05, 0.07),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
-    "heat_pump": [True],
+    # "heat_pump": [True],
     # "duration_increase": [0]
 }
 
