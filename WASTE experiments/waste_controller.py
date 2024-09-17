@@ -20,11 +20,12 @@ from ema_workbench import (
 # -------------------------------------- Read data and initiate a plant ----------------------------------
 plants_df = pd.read_csv("WASTE data all.csv",delimiter=";")
 # plants_df = plants_df.iloc[0].to_frame().T # This row makes us only iterate over the 1st plant
+# plants_df = plants_df.iloc[:3] # This row makes us only iterate over the 4 first plant
 all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
 
 # Load CHP Aspen data
-aspen_df = pd.read_csv("MEA-chip.csv", sep=";", decimal=',')
+aspen_df = pd.read_csv("W2E-final.csv", sep=";", decimal=',')
 aspen_interpolators = create_interpolators(aspen_df)
 
 for index, plant_data in plants_df.iterrows():
@@ -94,8 +95,8 @@ for index, plant_data in plants_df.iterrows():
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
-    n_scenarios = 150
-    n_policies = 20
+    n_scenarios = 250
+    n_policies = 40
 
     results = perform_experiments(model, n_scenarios, n_policies, uncertainty_sampling = Samplers.LHS, lever_sampling = Samplers.LHS)
     experiments, outcomes = results
