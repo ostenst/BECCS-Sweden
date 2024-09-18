@@ -1,7 +1,9 @@
 """This is what we do here."""
 import pandas as pd
 import copy
+import numpy as np
 from pyXSteam.XSteam import XSteam
+from scipy.interpolate import LinearNDInterpolator
 
 steamTable = XSteam(XSteam.UNIT_SYSTEM_MKS)
 class State:
@@ -30,6 +32,23 @@ class State:
             self.h = steamTable.h_ps(p,s)
         if self.p is None or self.T is None or self.s is None or self.h is None:
             raise ValueError("Steam properties cannot be determined")
+        
+def create_interpolators(aspen_df):
+    # Extract 'Flow' and 'Rcapture' columns as x values, the rest are y values
+    x1 = aspen_df['Flow']
+    x2 = aspen_df['Rcapture']
+    x_values = np.column_stack((x1, x2))
+
+    y_values = aspen_df.drop(columns=['Flow', 'Rcapture']).values  
+    aspen_interpolators = {}
+
+    # Create interpolation function for each y column
+    for idx, column_name in enumerate(aspen_df.drop(columns=['Flow', 'Rcapture']).columns):
+        y = y_values[:, idx]
+        interp_func = LinearNDInterpolator(x_values, y)
+        aspen_interpolators[column_name] = interp_func
+
+    return aspen_interpolators
 
 class PulpPlant:
     def __init__(self, name, pulp_capacity, bark_share, recovery_boiler, bark_boiler, heat_demand, electricity_demand, rp, rt, bp, bt, lp, energybalance_assumptions):
@@ -63,6 +82,9 @@ class PulpPlant:
         self.gases = {}
         self.results = {}
         self.nominal_state = {}
+
+    def get(self, parameter):
+        return np.round( self.aspen_data[parameter].values[0] )
     
     def estimate_nominal_cycle(self):
         # Calculating available steam
@@ -136,13 +158,44 @@ class PulpPlant:
             "V_fluegas": V_fluegas                                                      #[Nm3/s]
         }
 
-    def size_MEA(self, rate, pulp_interpolation):        
-        # print("Making a simplified MEA calculation for now, but an Aspen interpolator is required!")
-        Q_reboiler = 3.6 * (self.gases["recovery_emissions"]*1000 * rate) /3.6 #[MWh/yr]
-        W_captureplant = 0.15*Q_reboiler
+    # def size_MEA(self, rate, pulp_interpolation): 
+    #     print(" I need to replace this MEA sizing function with the new one. I thus need to figure out how the function outputs (Qreb, Wtot and makeup) are used")       
+    #     # print("Making a simplified MEA calculation for now, but an Aspen interpolator is required!")
+    #     Q_reboiler = 3.6 * (self.gases["recovery_emissions"]*1000 * rate) /3.6 #[MWh/yr]
+    #     print(Q_reboiler, " is the reboiler duty!")
+    #     W_captureplant = 0.15*Q_reboiler
 
-        self.results["Q_reboiler"] = Q_reboiler
-        self.results["W_captureplant"] = W_captureplant
+    #     self.results["Q_reboiler"] = Q_reboiler
+    #     self.results["W_captureplant"] = W_captureplant
+
+    def size_MEA(self, rate, pulp_interpolations):  
+        new_Flow = self.gases["m_fluegas"]  #[kg/s]
+        if new_Flow < 50:                    #The CHP interpolators only work between 50 kg/s / above 400kgs
+            new_Flow = 50
+        if new_Flow > 400:
+            new_Flow = 400
+
+        new_Rcapture = rate*100
+        new_y_values = {}
+
+        for column_name, interp_func in pulp_interpolations.items():
+            new_y = interp_func(([new_Flow], [new_Rcapture]))
+            new_y_values[column_name] = new_y
+
+        new_data = pd.DataFrame({
+            'Flow': [new_Flow],
+            'Rcapture': [new_Rcapture],
+            **new_y_values  # Unpack new y values dictionary
+        })
+
+        # Save data and calculate Qreb and Wtot
+        self.aspen_data = new_data
+        self.results["Q_reboiler"] = self.get("Qreb")/1000 *self.energybalance_assumptions["time"] #[MWh/yr]
+        W = 0
+        for Wi in ["Wpumps","Wcfg","Wc1","Wc2","Wc3","Wrefr1","Wrefr2","Wrecomp"]:
+            W += self.get(Wi) #[kW]
+        self.results["W_captureplant"] = W/1000 *self.energybalance_assumptions["time"] #[MWh/yr]
+        return
 
     def feed_then_condense(self):    
         # Re-calculate all capacities, after available steam has been reduced by Q_reboiler
@@ -298,9 +351,7 @@ class PulpPlant:
         P_lost = self.results["P_lost"]                                                                   #[MWh/yr] 
         Q_extra = self.results["extra_biomass"]                                                           #[MWh/yr]
         energy_OPEX = ( P_lost*economic_assumptions['celc'] + Q_extra*economic_assumptions['cbio'] )/1000 #[kEUR/yr]
-
-        # print("Solvent cost requires Aspen data, make simple estimate.")
-        other_OPEX = 0.10*energy_OPEX + economic_assumptions['cMEA']
+        other_OPEX = self.get("Makeup") * economic_assumptions['cMEA'] * 3600*self.energybalance_assumptions["time"] /1000  #[kEUR/yr]
         return energy_OPEX, other_OPEX
     
     def print_energybalance(self):
@@ -354,9 +405,9 @@ def CCS_Pulp(
 
     SupplyStrategy = "SteamLP",
     rate = 0.90,
-    BarkIncrease = "40",            #[%increase]
+    BarkIncrease = "30",            #[%increase]
 
-    pulp_interpolation=None,
+    pulp_interpolations=None,
     PulpPlant=None
 ):
     technology_assumptions = {
@@ -392,7 +443,7 @@ def CCS_Pulp(
 
     # Run model functions
     PulpPlant.burn_fuel(technology_assumptions)
-    PulpPlant.size_MEA(rate, pulp_interpolation)
+    PulpPlant.size_MEA(rate, pulp_interpolations)
 
     if SupplyStrategy == "SteamHP":
         PulpPlant.feed_then_condense()
@@ -438,7 +489,8 @@ if __name__ == "__main__":
     plant_data = plants_df.iloc[4]
 
     # Load PulpAspen data
-    interpolations = ["Interp1", "Interp2"]
+    aspen_df = pd.read_csv("PULP-final.csv", sep=";", decimal=',')
+    aspen_interpolators = create_interpolators(aspen_df)
 
     # Initate a PulpPlant and calculate its nominal energy balance
     energybalance_assumptions = {
@@ -469,5 +521,5 @@ if __name__ == "__main__":
     pulp_plant.estimate_nominal_cycle() 
 
     # The RDM evaluation starts below:
-    capture_cost, penalty_services, penalty_biomass, costs, emissions = CCS_Pulp(PulpPlant=pulp_plant, pulp_interpolation=interpolations)
+    capture_cost, penalty_services, penalty_biomass, costs, emissions = CCS_Pulp(PulpPlant=pulp_plant, pulp_interpolations=aspen_interpolators)
     print("Outcomes: ", capture_cost, penalty_services, penalty_biomass, costs, emissions)

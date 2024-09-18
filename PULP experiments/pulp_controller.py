@@ -24,9 +24,13 @@ all_experiments = pd.DataFrame()
 all_outcomes = pd.DataFrame()
 # plant_data = plants_df.iloc[5]
 
+# Load CHP Aspen data
+aspen_df = pd.read_csv("PULP-final.csv", sep=";", decimal=',')
+aspen_interpolators = create_interpolators(aspen_df)
+
 for index, plant_data in plants_df.iterrows():
+
     print(f"||| MODELLING {plant_data['Name']} PULP MILL |||")
-    interpolations = ["Interp1", "Interp2"]
 
     energybalance_assumptions = {
         "recovery_intensity": 18,       #[GJ/t]
@@ -92,7 +96,7 @@ for index, plant_data in plants_df.iterrows():
         ArrayOutcome("emissions"),
     ]
     model.constants = [
-        Constant("pulp_interpolation", interpolations),
+        Constant("pulp_interpolations", aspen_interpolators),
         Constant("PulpPlant", pulp_plant),
     ]
 

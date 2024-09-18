@@ -146,10 +146,10 @@ class W2E_plant:
         
     def size_MEA(self, rate, chp_interpolators):        
         new_Flow = self.gases["m_fluegas"]  #[kg/s]
-        if new_Flow < 3:                    #The CHP interpolators only work between 3 kg/s / above 170kgs
+        if new_Flow < 3:                    #The CHP interpolators only work between 3 kg/s / above 140kgs
             new_Flow = 3
-        if new_Flow > 170:
-            new_Flow = 170
+        if new_Flow > 140:
+            new_Flow = 140
 
         new_Rcapture = rate*100
         new_y_values = {}
@@ -186,7 +186,7 @@ class W2E_plant:
 
         W = 0
         for Wi in ["Wpumps","Wcfg","Wc1","Wc2","Wc3","Wrefr1","Wrefr2","Wrecomp"]:
-            W += self.get(Wi)
+            W += self.get(Wi) #[kW]
 
         # The new power output depends on the pressures of p,mix and p,CCS
         if a.p > mix.p: 
@@ -201,7 +201,7 @@ class W2E_plant:
         self.P = Pnew/1000
         self.Qdh = Qnew/1000
         self.reboiler_steam = [a,d]
-        self.results["W_captureplant"] = W/1000 
+        self.results["W_captureplant"] = W/1000 #[MW]
         self.results["Plost"] = Plost/1000
         self.results["Qlost"] = Qlost/1000
         return 
