@@ -12,7 +12,7 @@ WHAT I NEED TO DO TO FINISH THE MODELLING
     b) Waste        - y
     c) Pulp         - y
 
-4) Create Aspen data and redo the tests. Are the PRIM scenarios the same? For:
+4) Create Aspen data ( - y )and redo the tests. Are the PRIM scenarios the same? For:
     a) Pulp
     b) Waste (possibly skip? unsure...)
 
