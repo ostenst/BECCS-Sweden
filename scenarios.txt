@@ -1,52 +1,52 @@
 CHPs should settle for these criteria: y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 350) & (filtered_outcomes["penalty_biomass"] < 500)
 CHP1
 Plants above 300kt
-                        box 14
-                           min          max      qp value       qp value
-time               5381.821422  5996.392208  2.087370e-82            NaN
-duration_increase       1000.0       1000.0  7.810873e-64  2.272731e-114
-heat_pump               {True}       {True}  1.536347e-58            NaN
+                        box 13
+                           min          max       qp value qp value
+time               5305.901435  5998.708573  8.323938e-298      NaN
+duration_increase       1000.0       1000.0  5.519184e-245      0.0
+heat_pump               {True}       {True}  6.437985e-158      NaN
 
 Plants between 200-300kt
 CHP2
-                        box 20
-                           min          max       qp value       qp value
-i                     0.050039     0.077334            NaN   2.032524e-69
-time               5216.036943  5997.172835  2.441914e-123            NaN
-duration_increase  1000.000000  1000.000000  7.135406e-113  2.259032e-187
+                       box 13
+                          min          max       qp value qp value
+time               5304.06577  5999.825723   0.000000e+00      NaN
+duration_increase      1000.0       1000.0   0.000000e+00      0.0
+heat_pump              {True}       {True}  8.897764e-297      NaN
 
 Plants below 200kt
 CHP3
-                        box 20
-                           min          max       qp value       qp value
-i                     0.050007     0.074952            NaN  2.769174e-180
-duration_increase  1000.000000  1000.000000  8.567247e-260   0.000000e+00
-time               5156.961639  5999.593822  1.000170e-255            NaN
+                        box 19
+                           min          max qp value qp value
+i                     0.050002     0.077321      NaN      0.0
+time               5130.264365  5999.916087      0.0      NaN
+duration_increase  1000.000000  1000.000000      0.0      0.0
 
 
 Plants above 300kt (zero biomass, PRIM threshold = 0.4 instead of 0.5)
 CHP11
-                box 17
-                   min        max      qp value qp value
-heat_pump       {True}     {True}  1.387871e-22      NaN
-COP           3.259885   3.698761  2.382964e-16  0.02898
-time       4841.663162  5994.3291  8.513890e-09      NaN
+              box 23
+                 min        max      qp value      qp value
+celc       20.020017  48.451146           NaN  1.190630e-68
+heat_pump     {True}     {True}  1.503322e-44           NaN
+COP         3.146602   3.799055  1.303077e-26           NaN
 
 Plants between 200-300kt (zero biomass, PRIM threshold = 0.4 instead of 0.5)
 CHP22
-                box 24
+                box 23
                    min          max      qp value      qp value
-time       5381.821422  5997.172835  6.409069e-23           NaN
-heat_pump       {True}       {True}  9.520002e-17           NaN
-celc         23.718479    65.499006  4.979949e-01  2.658321e-26
+celc         20.127067    67.270522           NaN  3.687931e-65
+heat_pump       {True}       {True}  1.851611e-95           NaN
+time       5467.212221  5999.825723  4.179381e-86           NaN
 
 Plants below 200kt (zero biomass, PRIM threshold = 0.4 instead of 0.5)
 CHP33
                 box 23
-                   min          max       qp value       qp value
-i             0.050007     0.066644            NaN  6.899088e-105
-heat_pump       {True}       {True}  1.436419e-177            NaN
-time       4986.332828  5999.593822   4.113115e-41            NaN
+                   min          max       qp value qp value
+i             0.050002     0.072007            NaN      0.0
+heat_pump       {True}       {True}   0.000000e+00      NaN
+time       5375.459488  5999.916087  2.296474e-309      NaN
 
 -------------------------------------------------------------------------
 

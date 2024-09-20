@@ -152,13 +152,13 @@ def plot_densitymap(satisficing_df, coordinates_df):
         ellipse = Ellipse((row['Longitude'], row['Latitude']), width=radius_x * 2, height=radius_y * 2, edgecolor=edgecolor, facecolor=color, fill=True, linewidth=1.0)
         ax.add_patch(ellipse)
 
-        if row['Gross CO2'] > 250: #Only [%] above 
+        if row['Gross CO2'] > 260: #Only [%] above 
             ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
-        if row['Gross CO2'] > 330: #Only [kt] above
-            ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
-        if row['Gross CO2'] > 450: #Only name above
-            # move this text 
-            ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
+        # if row['Gross CO2'] > 330: #Only [kt] above
+        #     ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
+        # if row['Gross CO2'] > 450: #Only name above
+        #     # move this text 
+        #     ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
             
     sm = cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
@@ -173,6 +173,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     ax.set_xlabel('Longitude')
     ax.set_ylabel('Latitude')
     plt.tight_layout()
+    fig.savefig('UNNAMED_map.png', dpi=600)
 
 def plot_everything(experiments, outcomes, coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds):
         
@@ -261,11 +262,11 @@ plot_everything(chp_experiments, chp_outcomes, chp_coordinates, numerical_restri
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
-    'COP': (3.26, 3.80),
-    # # 'Tlow': (43, 50.7),
+    'COP': (3.14, 3.80),
+    'celc': (20, 48),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
-    'time': (4841, 5999),
+    # 'time': (5305, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
@@ -274,10 +275,10 @@ categorical_restrictions_1 = {
 }
 numerical_restrictions_2 = {
     # 'COP': (2.45, 3.80),
-    'celc': (23, 65),
+    'celc': (20, 67),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.077),
-    'time': (5381, 5999),
+    'time': (5467, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
@@ -288,8 +289,8 @@ numerical_restrictions_3 = {
     # 'COP': (2.45, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.066),
-    'time': (4986, 5999),
+    'i': (0.05, 0.077),
+    'time': (5375, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {

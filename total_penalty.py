@@ -109,19 +109,16 @@ high_gross_names = gross_means[(gross_means > 300)].index.tolist()
 boolean = chp_outcomes['Name'].isin(high_gross_names)
 filtered_outcomes_high = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_high = chp_experiments[boolean].reset_index(drop=True)
-print("HIGH", high_gross_names)
 
 mid_gross_names = gross_means[(gross_means > 200) & (gross_means < 300)].index.tolist()
 boolean = chp_outcomes['Name'].isin(mid_gross_names)
 filtered_outcomes_mid = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_mid = chp_experiments[boolean].reset_index(drop=True)
-print("MID", mid_gross_names)
 
 low_gross_names = gross_means[(gross_means < 200)].index.tolist()
 boolean = chp_outcomes['Name'].isin(low_gross_names)
 filtered_outcomes_low = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
-print("LOW", low_gross_names)
 
 numerical_restrictions_1 = {
     # 'COP': (3.26, 3.80),
@@ -182,19 +179,16 @@ high_gross_names = gross_means[(gross_means > 350)].index.tolist()
 boolean = w2e_outcomes['Name'].isin(high_gross_names)
 filtered_outcomes_high = w2e_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_high = w2e_experiments[boolean].reset_index(drop=True)
-print("HIGH", high_gross_names)
 
 mid_gross_names = gross_means[(gross_means > 150) & (gross_means < 350)].index.tolist()
 boolean = w2e_outcomes['Name'].isin(mid_gross_names)
 filtered_outcomes_mid = w2e_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_mid = w2e_experiments[boolean].reset_index(drop=True)
-print("MID", mid_gross_names)
 
 low_gross_names = gross_means[(gross_means < 150)].index.tolist()
 boolean = w2e_outcomes['Name'].isin(low_gross_names)
 filtered_outcomes_low = w2e_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = w2e_experiments[boolean].reset_index(drop=True)
-print("LOW", low_gross_names)
 
 
 numerical_restrictions_1 = {
