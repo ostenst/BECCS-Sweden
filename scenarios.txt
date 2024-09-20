@@ -50,114 +50,115 @@ time       5375.459488  5999.916087  2.296474e-309      NaN
 
 -------------------------------------------------------------------------
 
-W2E should settle for these criteria: y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 350) & (filtered_outcomes["penalty_biomass"] < 0)
+W2E should settle for these criteria: y = (filtered_outcomes["capture_cost"] < 100) & (filtered_outcomes["penalty_services"] < 350) & (filtered_outcomes["penalty_biomass"] < 1)
 WASTE1
 Plants above 350kt
-              box 16
-                 min        max      qp value      qp value
-celc       20.212437  80.944133           NaN  6.263601e-71
-heat_pump     {True}     {True}  0.000000e+00           NaN
-COP         2.985703   3.796962  5.969329e-63           NaN
+             box 19
+                min        max  qp value       qp value
+i          0.050001   0.082377       NaN  2.403470e-174
+heat_pump    {True}     {True}  0.000000            NaN
+celc       26.39939  75.570204  0.448662  1.053206e-280
 
 Plants between 150-350kt
 WASTE2
-              box 21
-                 min        max  qp value       qp value
-celc       20.035578  74.087937       NaN  3.082498e-199
-heat_pump     {True}     {True}  0.000000            NaN
-i           0.052697   0.079457  0.076575  7.370784e-137
+              box 22
+                 min        max qp value qp value
+celc       20.009665  63.894748      NaN      0.0
+i           0.050008   0.074682      NaN      0.0
+heat_pump     {True}     {True}      0.0      NaN
 
 Plants below 150kt
 WASTE3
               box 22
-                 min        max       qp value       qp value
-i           0.050002   0.069922            NaN  4.625745e-200
-celc       20.150241  73.180896            NaN  7.906288e-125
-heat_pump     {True}     {True}  7.565502e-134            NaN
+                 min        max qp value       qp value
+i           0.050021   0.074159      NaN   0.000000e+00
+celc       20.019866  62.109761      NaN  2.797249e-291
+heat_pump     {True}     {True}      0.0            NaN
 
 -------------------------------------------------------------------------
 
-PULP should settle for these criteria:y = (pulp_outcomes["capture_cost"] < 90) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200)
+PULP should settle for these criteria:y = (pulp_outcomes["capture_cost"] < 80) & (pulp_outcomes["penalty_services"] < 450) & (pulp_outcomes["penalty_biomass"] < 200)
 PULP1
-                   box 15
+                 box 15
+                    min        max      qp value       qp value
+celc          20.038882  73.376808           NaN  7.449151e-137
+rate           0.796435   0.902995  4.692850e-19   6.452193e-05
+BarkIncrease  30.000000  30.000000  5.235163e-08  1.665537e-297
+                   box 19
                       min        max       qp value       qp value
-celc            20.240774  67.783553            NaN  1.533760e-285
-BarkIncrease          0.0        0.0            NaN  7.719597e-267
-SupplyStrategy  {SteamLP}  {SteamLP}  8.928711e-153            NaN
-                            box 18
-                               min                 max      qp value      qp value
-celc                     20.240774           67.783553           NaN  1.219073e-75
-SupplyStrategy  {SteamLP, SteamHP}  {SteamLP, SteamHP}  9.956681e-30           NaN
-rate                      0.865837            0.926882  9.521749e-03  1.367091e-87
+celc            20.038882  73.694124            NaN  4.724225e-102
+beta             0.600014   0.649473            NaN   1.313883e-26
+SupplyStrategy  {SteamLP}  {SteamLP}  6.965715e-119            NaN
 
 PULP2
-                   box 16
-                      min        max      qp value       qp value
-celc            20.119278  58.274761           NaN  2.555768e-169
-BarkIncrease          0.0       30.0           NaN   3.090765e-55
-SupplyStrategy  {SteamLP}  {SteamLP}  2.247300e-90            NaN
-                              box 21
-                                 min                   max      qp value      qp value
-celc                       20.119278             45.633321           NaN  2.836875e-87
-beta                        0.600052              0.658961           NaN  1.802776e-12
-SupplyStrategy  {HeatPumps, SteamLP}  {HeatPumps, SteamLP}  1.373677e-23           NaN
+                 box 17
+                    min        max qp value       qp value
+celc          20.071836  58.278508      NaN   0.000000e+00
+BarkIncrease   0.000000  30.000000      NaN  7.508753e-208
+beta           0.600151   0.675009      NaN   7.305604e-21
+                   box 21
+                      min        max      qp value      qp value
+celc            20.071836  51.430753           NaN  6.133747e-68
+beta             0.600151   0.671147           NaN  2.282693e-06
+SupplyStrategy  {SteamLP}  {SteamLP}  1.216113e-31           NaN
 
 PULP3
-                    box 9
-                      min        max      qp value      qp value
-BarkIncrease          0.0        0.0           NaN  7.498815e-44
-SupplyStrategy  {SteamLP}  {SteamLP}  5.435290e-88           NaN
-rate             0.818493   0.897492  1.385394e-01  5.098108e-01
-                   box 25
+                   box 15
                       min        max       qp value       qp value
-celc            20.071454  49.940652            NaN  9.577031e-115
-beta             0.600128   0.688997            NaN   6.256907e-03
-SupplyStrategy  {SteamLP}  {SteamLP}  2.769825e-116            NaN
+celc            20.181162  62.870386            NaN  2.558223e-174
+BarkIncrease          0.0       30.0            NaN  1.634226e-106
+SupplyStrategy  {SteamLP}  {SteamLP}  1.060200e-123            NaN
+                   box 19
+                      min        max       qp value      qp value
+celc            20.181162  79.930839            NaN  7.081285e-89
+beta               0.6002   0.644393            NaN  1.533459e-35
+SupplyStrategy  {SteamLP}  {SteamLP}  8.359592e-100           NaN
 
 PULP4
-                        min          max       qp value       qp value
-SupplyStrategy  {HeatPumps}  {HeatPumps}  1.217382e-178            NaN
-COP                 2.97134     3.797015   1.297943e-30            NaN
-celc               34.16836    75.165437   8.573632e-02  1.182871e-105
-                     box 18
+                     box 15
+                        min          max       qp value      qp value
+celc              20.064033    85.588088            NaN  4.894218e-59
+SupplyStrategy  {HeatPumps}  {HeatPumps}  2.532520e-299           NaN
+i                   0.05491     0.095512   3.699256e-01  1.036312e-22
+                    box 13
                         min          max      qp value      qp value
-celc              20.156281     48.59367           NaN  8.931090e-37
-SupplyStrategy  {HeatPumps}  {HeatPumps}  4.649574e-45           NaN
-k               -138.037381   156.342545  7.754911e-02           NaN
+celc              20.064033    85.588088           NaN  2.313796e-14
+i                  0.050093     0.095512           NaN  3.949644e-07
+SupplyStrategy  {HeatPumps}  {HeatPumps}  2.666328e-78           NaN
 
 PULP5
-                              box 15
-                                 min                   max      qp value       qp value
-celc                        20.21395             58.405827           NaN  2.385961e-179
-BarkIncrease                     0.0                  30.0           NaN   1.775132e-35
-SupplyStrategy  {HeatPumps, SteamLP}  {HeatPumps, SteamLP}  1.044646e-24            NaN
-                   box 16
-                      min        max      qp value      qp value
-SupplyStrategy  {SteamLP}  {SteamLP}  1.091327e-25           NaN
-celc            24.253493  61.921461  2.325764e-01  8.382797e-37
-i                 0.05608   0.112209  2.578756e-01  1.069173e-01
+                   box 14
+                      min        max      qp value       qp value
+celc             20.07187  67.925343           NaN  1.291738e-185
+SupplyStrategy  {SteamLP}  {SteamLP}  8.110185e-76            NaN
+BarkIncrease           30         60  7.897582e-05   5.687715e-68
+                     box 23
+                        min          max      qp value      qp value
+celc               20.07187     54.11585           NaN  1.200655e-68
+COP                3.222204     3.797355  3.077644e-34           NaN
+SupplyStrategy  {HeatPumps}  {HeatPumps}  5.048668e-23           NaN
 
 PULP6
-                   box 16
+                   box 13
                       min        max       qp value       qp value
-celc            20.219613  58.340813            NaN  2.470328e-322
-BarkIncrease          0.0       30.0            NaN  1.224421e-121
-SupplyStrategy  {SteamLP}  {SteamLP}  1.836298e-205            NaN
-                   box 16
+BarkIncrease          0.0       30.0            NaN  3.157380e-174
+celc            20.017138  73.479333            NaN  3.008936e-135
+SupplyStrategy  {SteamLP}  {SteamLP}  1.152444e-111            NaN
+                   box 21
                       min        max      qp value      qp value
-celc            20.219613  67.599695           NaN  1.466437e-59
-beta             0.600147   0.664264           NaN  1.008195e-02
-SupplyStrategy  {SteamLP}  {SteamLP}  2.467977e-66           NaN
+celc            20.017138  48.386262           NaN  2.233297e-73
+beta             0.600013   0.667395           NaN  2.182596e-05
+SupplyStrategy  {SteamLP}  {SteamLP}  3.250926e-53           NaN
 
 PULP7
-                   box 15
-                      min        max       qp value       qp value
-celc            20.190757  62.788717            NaN  7.614957e-166
-BarkIncrease          0.0       30.0            NaN   2.479479e-96
-SupplyStrategy  {SteamLP}  {SteamLP}  4.071975e-111            NaN
-                   box 15
-                      min        max      qp value      qp value
-celc            20.190757  67.874617           NaN  3.320341e-53
-rate             0.820349    0.85845           NaN  7.344575e-14
-SupplyStrategy  {SteamLP}  {SteamLP}  1.272422e-18           NaN
+                 box 19
+                    min        max qp value       qp value
+celc          20.129782  55.281246      NaN  3.402580e-249
+BarkIncrease   0.000000  30.000000      NaN  3.104714e-208
+beta           0.600017   0.661985      NaN   1.807484e-14
+                   box 17
+                      min        max      qp value       qp value
+celc            20.129782  62.356865           NaN  8.390787e-106
+beta             0.600017   0.663454           NaN   1.247713e-11
+SupplyStrategy  {SteamLP}  {SteamLP}  3.486955e-23            NaN
 

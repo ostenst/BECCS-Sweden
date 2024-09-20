@@ -152,13 +152,13 @@ def plot_densitymap(satisficing_df, coordinates_df):
         ellipse = Ellipse((row['Longitude'], row['Latitude']), width=radius_x * 2, height=radius_y * 2, edgecolor=edgecolor, facecolor=color, fill=True, linewidth=1.0)
         ax.add_patch(ellipse)
 
-        if row['Gross CO2'] > 250: #Only [%] above 
+        if row['Gross CO2'] > 260: #Only [%] above 
             ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
-        if row['Gross CO2'] > 330: #Only [kt] above
-            ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
-        if row['Gross CO2'] > 450: #Only name above
-            # move this text 
-            ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
+        # if row['Gross CO2'] > 330: #Only [kt] above
+        #     ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
+        # if row['Gross CO2'] > 450: #Only name above
+        #     # move this text 
+        #     ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
             
     sm = cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
@@ -173,6 +173,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     ax.set_xlabel('Longitude')
     ax.set_ylabel('Latitude')
     plt.tight_layout()
+    fig.savefig('UNNAMED_map.png', dpi=600)
 
 def plot_everything(experiments, outcomes, coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds):
         
@@ -227,7 +228,7 @@ categorical_restrictions = {
 #     'penalty_biomass': 500
 # }
 satisficing_thresholds_2 = {
-    'capture_cost': 120,
+    'capture_cost': 100,
     'penalty_services': 350,
     'penalty_biomass': 1
 }
@@ -264,10 +265,10 @@ filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
-    'COP': (3, 3.80),
-    'celc': (20, 80),
+    # 'COP': (3, 3.80),
+    'celc': (26, 75),
     # # 'rate': (0.78, 0.893),
-    # # 'i': (0.05, 0.10),
+    'i': (0.05, 0.08),
     # 'time': (4400, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -277,9 +278,9 @@ categorical_restrictions_1 = {
 }
 numerical_restrictions_2 = {
     # 'COP': (3, 3.80),
-    'celc': (20, 74),
+    'celc': (20, 64),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.08),
+    'i': (0.05, 0.074),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -288,10 +289,10 @@ categorical_restrictions_2 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'celc': (20, 73),
+    'celc': (20, 62),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.07),
+    'i': (0.05, 0.074),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }

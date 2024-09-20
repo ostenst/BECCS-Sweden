@@ -152,13 +152,13 @@ def plot_densitymap(satisficing_df, coordinates_df):
         ellipse = Ellipse((row['Longitude'], row['Latitude']), width=radius_x * 2, height=radius_y * 2, edgecolor=edgecolor, facecolor=color, fill=True, linewidth=1.0)
         ax.add_patch(ellipse)
 
-        if row['Gross CO2'] > 250: #Only [%] above 
+        if row['Gross CO2'] > 200: #Only [%] above 
             ax.text(row['Longitude'], row['Latitude'], f"{round(row['Density']*100)}%", fontsize=7, ha='center', va='center')
-        if row['Gross CO2'] > 330: #Only [kt] above
-            ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
-        if row['Gross CO2'] > 450: #Only name above
-            # move this text 
-            ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
+        # if row['Gross CO2'] > 330: #Only [kt] above
+        #     ax.text(row['Longitude']+radius_x, row['Latitude'], f"{round(row['Gross CO2'])} kt", fontsize=7, ha='left', va='center')
+        # if row['Gross CO2'] > 450: #Only name above
+        #     # move this text 
+        #     ax.text(row['Longitude']+radius_x, row['Latitude']+0.2, Title, fontsize=7, ha='left', va='center')
             
     sm = cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
@@ -173,6 +173,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     ax.set_xlabel('Longitude')
     ax.set_ylabel('Latitude')
     plt.tight_layout()
+    fig.savefig('UNNAMED_map.png', dpi=600)
 
 def plot_everything(experiments, outcomes, coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds):
         
@@ -268,37 +269,37 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # # BELOW IS FOR REGULAR SCENARIO
 # numerical_restrictions_1 = {
 #     # 'COP': (3.28, 3.80),
-#     'celc': (20, 68),
-#     # 'rate': (0.78, 0.893),
+#     'celc': (20, 73),
+#     'rate': (0.79, 0.90),
 # }
 # categorical_restrictions_1 = {
-#     "SupplyStrategy": ["SteamLP"],
-#     "BarkIncrease": [0]
+#     # "SupplyStrategy": ["SteamLP"],
+#     "BarkIncrease": [30]
 # }
 
 # numerical_restrictions_2 = {
-#     # 'COP': (3.28, 3.80),
+#     'beta': (0.6, 0.675),
 #     'celc': (20, 58),
 #     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_2 = {
-#     "SupplyStrategy": ["SteamLP"],
+#     # "SupplyStrategy": ["SteamLP"],
 #     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_3 = {
-#     'rate': (0.82, 0.90),
-#     # 'celc': (20, 84),
-#     # 'BarkIncrease': (None, 31),
+#     # 'rate': (0.82, 0.90),
+#     'celc': (20, 63),
+#     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_3 = {
 #     "SupplyStrategy": ["SteamLP"],
-#     "BarkIncrease": [0]
+#     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_4 = {
-#     'COP': (2.97, 3.80),
-#     'celc': (34, 75),
+#     'i': (0.05, 0.095),
+#     'celc': (20, 85),
 #     # 'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_4 = {
@@ -309,17 +310,17 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # numerical_restrictions_5 = {
 #     # 'COP': (2.9, 3.80),
 #     # 'rate': (0.80, 94),
-#     'celc': (20, 58),
-#     'BarkIncrease': (None, 31),
+#     'celc': (20, 68),
+#     'BarkIncrease': (29, 61),
 # }
 # categorical_restrictions_5 = {
-#     "SupplyStrategy": ["HeatPumps", "SteamLP"],
+#     "SupplyStrategy": ["SteamLP"],
 #     # "BarkIncrease": [0]
 # }
 
 # numerical_restrictions_6 = {
 #     # 'COP': (3.28, 3.80),
-#     'celc': (20, 58),
+#     'celc': (20, 73),
 #     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_6 = {
@@ -328,20 +329,20 @@ plot_minmax_values(pulp_outcomes, "penalty_biomass")
 # }
 
 # numerical_restrictions_7 = {
-#     # 'COP': (3.28, 3.80),
-#     'celc': (20, 63),
+#     'beta': (0.6, 0.66),
+#     'celc': (20, 55),
 #     'BarkIncrease': (None, 31),
 # }
 # categorical_restrictions_7 = {
-#     "SupplyStrategy": ["SteamLP"],
+#     # "SupplyStrategy": ["SteamLP"],
 #     # "BarkIncrease": [0]
 # }
 
 # BELOW ARE ZERO BIOMASS SCENARIOS
 numerical_restrictions_1 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 68),
-    'rate': (0.86, 0.93),
+    'beta': (0.6, 0.65),
+    'celc': (20, 74),
+    # 'rate': (0.86, 0.93),
 }
 categorical_restrictions_1 = {
     "SupplyStrategy": ["SteamLP", "SteamHP"],
@@ -349,18 +350,18 @@ categorical_restrictions_1 = {
 }
 
 numerical_restrictions_2 = {
-    'beta': (0.6, 0.66),
-    'celc': (20, 46),
+    'beta': (0.6, 0.67),
+    'celc': (20, 51),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_2 = {
-    "SupplyStrategy": ["HeatPumps", "SteamLP"],
+    "SupplyStrategy": ["SteamLP"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_3 = {
-    'beta': (0.6, 0.69),
-    'celc': (20, 50),
+    'beta': (0.6, 0.64),
+    'celc': (20, 80),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_3 = {
@@ -369,8 +370,8 @@ categorical_restrictions_3 = {
 }
 
 numerical_restrictions_4 = {
-    'k': (-138, 156),
-    'celc': (20, 49),
+    'i': (0.05, 0.095),
+    'celc': (20, 85),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_4 = {
@@ -379,18 +380,18 @@ categorical_restrictions_4 = {
 }
 
 numerical_restrictions_5 = {
-    'i': (0.05, 0.11),
-    'celc': (24, 62),
+    'COP': (3.2, 3.8),
+    'celc': (20, 54),
     # 'BarkIncrease': (None, 61),
 }
 categorical_restrictions_5 = {
-    "SupplyStrategy": ["SteamLP"],
+    "SupplyStrategy": ["HeatPumps"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_6 = {
     'beta': (0.6, 0.66),
-    'celc': (20, 68),
+    'celc': (20, 48),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_6 = {
@@ -399,8 +400,8 @@ categorical_restrictions_6 = {
 }
 
 numerical_restrictions_7 = {
-    'rate': (0.82, 0.85),
-    'celc': (20, 68),
+    'rate': (0.6, 0.66),
+    'celc': (20, 62),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_7 = {
