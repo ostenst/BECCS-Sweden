@@ -204,7 +204,7 @@ class PulpPlant:
             a = -remaining_demand *1000 #[kWh/yr]
             remaining_demand = 0
         else:
-            print("High pressure steam is insufficient for the pulp mill ", self.name)
+            # print("High pressure steam is insufficient for the pulp mill ", self.name)
             a = 0
         r = self.recovery_capacity
         b = self.bark_capacity
