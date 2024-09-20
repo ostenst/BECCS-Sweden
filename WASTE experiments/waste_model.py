@@ -307,7 +307,6 @@ class W2E_plant:
         if not self.technology_assumptions["heat_pump"]:
             Qhp = 0
         Php = Qhp/self.technology_assumptions["COP"]
-        print(Php)
 
         self.P -= Php/1000
         self.results["Plost"] += Php/1000
