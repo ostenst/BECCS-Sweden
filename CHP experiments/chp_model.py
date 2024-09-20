@@ -315,7 +315,7 @@ class CHP_plant:
         self.results["Qrecovered"] = (Qhex + Qhp)/1000
         self.results["Qhp"] = Qhp/1000
         self.QTdict = {
-            "supp": [Qsupp, Tsupp],
+            "supp": [Qsupp, 86], # BUG: Also hard-coded
             "low": [Qlow, Tlow],
             "pinch": [Qpinch, Tpinch]
         }
@@ -456,7 +456,7 @@ def CCS_CHP(
     
     time=5000,
 
-    duration_increase="1000",       #[h/yr]
+    duration_increase="0",       #[h/yr]
     rate=0.90,
     heat_pump=True,
 
@@ -537,6 +537,7 @@ def CCS_CHP(
     penalty_biomass  = CHP.results["Qextra"]          / (CHP.gases["captured_emissions"])                                       #[MWh/kt]        
 
     # CHP.print_energybalance()
+    # CHP.plot_hexchange(show=False) 
     CHP.reset()
     return capture_cost, penalty_services, penalty_biomass, costs, emissions
 
@@ -544,8 +545,8 @@ def CCS_CHP(
 if __name__ == "__main__":
 
     # Load plant data
-    plants_df = pd.read_csv("CHP data.csv",delimiter=";")
-    plant_data = plants_df.iloc[0]
+    plants_df = pd.read_csv("CHP data all.csv",delimiter=";")
+    plant_data = plants_df.iloc[1]
 
     # Load CHP Aspen data
     aspen_df = pd.read_csv("MEA-chip.csv", sep=";", decimal=',')

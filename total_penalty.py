@@ -109,23 +109,26 @@ high_gross_names = gross_means[(gross_means > 300)].index.tolist()
 boolean = chp_outcomes['Name'].isin(high_gross_names)
 filtered_outcomes_high = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_high = chp_experiments[boolean].reset_index(drop=True)
+print("HIGH", high_gross_names)
 
 mid_gross_names = gross_means[(gross_means > 200) & (gross_means < 300)].index.tolist()
 boolean = chp_outcomes['Name'].isin(mid_gross_names)
 filtered_outcomes_mid = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_mid = chp_experiments[boolean].reset_index(drop=True)
+print("MID", mid_gross_names)
 
 low_gross_names = gross_means[(gross_means < 200)].index.tolist()
 boolean = chp_outcomes['Name'].isin(low_gross_names)
 filtered_outcomes_low = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
+print("LOW", low_gross_names)
 
 numerical_restrictions_1 = {
-    'COP': (3.0, 3.80),
+    # 'COP': (3.26, 3.80),
     # # 'Tlow': (43, 50.7),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
-    'time': (4387, 5999),
+    # 'time': (4841, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
@@ -133,11 +136,11 @@ categorical_restrictions_1 = {
     "duration_increase": [0]
 }
 numerical_restrictions_2 = {
-    'COP': (2.45, 3.80),
-    # 'Tsupp': (83, 100),
+    # 'COP': (2.45, 3.80),
+    # 'celc': (23, 65),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.10),
-    'time': (4200, 5999),
+    # 'i': (0.05, 0.077),
+    # 'time': (5381, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
@@ -145,11 +148,11 @@ categorical_restrictions_2 = {
     "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'COP': (2.45, 3.80),
+    # 'COP': (2.45, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.10),
-    'time': (4202, 5999),
+    # 'i': (0.05, 0.066),
+    # 'time': (4986, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
@@ -179,20 +182,24 @@ high_gross_names = gross_means[(gross_means > 350)].index.tolist()
 boolean = w2e_outcomes['Name'].isin(high_gross_names)
 filtered_outcomes_high = w2e_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_high = w2e_experiments[boolean].reset_index(drop=True)
+print("HIGH", high_gross_names)
 
 mid_gross_names = gross_means[(gross_means > 150) & (gross_means < 350)].index.tolist()
 boolean = w2e_outcomes['Name'].isin(mid_gross_names)
 filtered_outcomes_mid = w2e_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_mid = w2e_experiments[boolean].reset_index(drop=True)
+print("MID", mid_gross_names)
 
 low_gross_names = gross_means[(gross_means < 150)].index.tolist()
 boolean = w2e_outcomes['Name'].isin(low_gross_names)
 filtered_outcomes_low = w2e_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = w2e_experiments[boolean].reset_index(drop=True)
+print("LOW", low_gross_names)
+
 
 numerical_restrictions_1 = {
-    'COP': (3.28, 3.80),
-    'celc': (20, 90),
+    # 'COP': (3, 3.80),
+    # 'celc': (20, 80),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
     # 'time': (4400, 5999),
@@ -203,10 +210,10 @@ categorical_restrictions_1 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_2 = {
-    'COP': (3, 3.80),
-    'celc': (20, 85),
-    # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.10),
+    # 'COP': (3, 3.80),
+    # 'celc': (20, 74),
+    # # 'rate': (0.78, 0.893),
+    # 'i': (0.05, 0.08),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -215,10 +222,10 @@ categorical_restrictions_2 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'COP': (2.6, 3.80),
+    # 'celc': (20, 73),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.10),
+    # 'i': (0.05, 0.07),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -339,6 +346,14 @@ for subset in separate_mills:
     filtered_pulp_experiments = pd.concat([filtered_pulp_experiments, experiments]) # Stores the filtered experiments and outcomes
     filtered_pulp_outcomes = pd.concat([filtered_pulp_outcomes, outcomes])
 
+# Add labels to the experiments
+filtered_chp_experiments["type"] = "chp"
+filtered_w2e_experiments["type"] = "w2e"
+filtered_pulp_experiments["type"] = "pulp"
+
+filtered_chp_outcomes["type"] = "chp"
+filtered_w2e_outcomes["type"] = "w2e"
+filtered_pulp_outcomes["type"] = "pulp"
 
 # COMBINE DATAFRAMES and find sorting order
 combined_experiments = pd.concat([filtered_chp_experiments, filtered_w2e_experiments, filtered_pulp_experiments])
@@ -356,20 +371,26 @@ summary = data.groupby("Name").agg({
     "capture_cost": ['mean', lambda x: x.quantile(0.05), lambda x: x.quantile(0.95)],
     "penalty_services": ['mean', lambda x: x.quantile(0.05), lambda x: x.quantile(0.95)],
     "penalty_services_total": ['mean', lambda x: x.quantile(0.05), lambda x: x.quantile(0.95)],
-    "captured": ['mean', lambda x: x.quantile(0.05), lambda x: x.quantile(0.95)] # [kt/yr]
+    "captured": ['mean', lambda x: x.quantile(0.05), lambda x: x.quantile(0.95)],  # [kt/yr]
+    "type": lambda x: x.iloc[0]  # Take the first type (since all rows of the same 'Name' have the same 'type')
 })
+
 summary.columns = [
     "cost_mean", "cost_5th", "cost_95th",
     "services_mean", "services_5th", "services_95th",
     "total_mean", "total_5th", "total_95th",
-    "CO2_mean", "CO2_5th", "CO2_95th"
+    "CO2_mean", "CO2_5th", "CO2_95th",
+    "type"  # Add type as the last column
 ]
+
+# Ensure the summary follows the sorted order of 'Name'
 summary = summary.reindex(sorted_grouped.index)
 
 
 # Normalize the color map based on the cost_mean for better visualization
 norm = plt.Normalize(0, sum(summary['total_95th'])) #NOTE: Color based on cumulative energy penalty instead!
 cmap = plt.get_cmap("viridis")
+
 def truncate_label(label, max_length=17):
     if len(label) > max_length:
         return label[:max_length] + '.'
@@ -377,6 +398,11 @@ def truncate_label(label, max_length=17):
 
 # Initialize the plot
 fig, ax = plt.subplots(figsize=(14, 8))
+ax2 = ax.twinx() 
+
+# Variables to store cumulative x and y values for the connected cumulative penalty
+x_values = []
+y_values = []
 
 # Plot each box for each Name
 x_start = 0
@@ -399,6 +425,14 @@ for i, name in enumerate(summary.index):
     color_mean += total_mean
     color_95th += total_95th
 
+    type_i = summary.loc[name, "type"]
+    if type_i == "chp":
+        type_color = "black"
+    elif type_i == "w2e":
+        type_color = "grey"
+    else:
+        type_color = "mediumseagreen"
+
     x_end = x_start + CO2_mean
 
     # Create a rectangle for each Name 1800 kt (2030), 3000-10000 (2045)
@@ -412,8 +446,15 @@ for i, name in enumerate(summary.index):
     )
     ax.add_patch(rect)
     # ax.plot([x_start, x_end], [services_5th, services_5th], color=cmap(norm(color_5th)), linewidth=2, alpha=0.4)
-    ax.plot([x_start, x_end], [services_mean, services_mean], color=cmap(norm(color_mean)), linewidth=4)
+    # ax.plot([x_start, x_end], [services_mean, services_mean], color=cmap(norm(color_mean)), linewidth=4)
+
+    ax.plot([x_start, x_end], [services_mean, services_mean], color=type_color, linewidth=3)
     # ax.plot([x_start, x_end], [services_95th, services_95th], color=cmap(norm(color_95th)), linewidth=2, alpha=0.4)
+
+    # Store the x and y values for the cumulative total_mean
+    x_values.extend([x_start, x_end])  # Add both the starting and ending x values
+    y_values.extend([color_mean, color_mean])  # Add both the starting and ending y values
+    # ax2.plot([x_start, x_end], [color_mean, color_mean], color="red", linewidth=2, linestyle="--")
 
     # Store the x position for the label
     x_positions.append(x_end)
@@ -431,24 +472,35 @@ for i, name in enumerate(summary.index):
         target_count += 1
 
     if x_end > 20000 and target_count < 3:
-        print("Cumulative ES penalty @20 Mt [GWh/yr] =", color_5th)
-        print("Cumulative ES penalty @20 Mt [GWh/yr] =", color_mean)
-        print("Cumulative ES penalty @20 Mt [GWh/yr] =", color_95th)
+        print("Cumulative ES penalty @>20 Mt [GWh/yr] =", color_5th)
+        print("Cumulative ES penalty @>20 Mt [GWh/yr] =", color_mean)
+        print("Cumulative ES penalty @>20 Mt [GWh/yr] =", color_95th)
+        print("Total CO2 captured across all plants [Mt/yr] =", x_end/1000)
         target_count += 1
 
     x_start = x_end
 
+# Plot the connected dashed line on the secondary axis
+ax2.plot(x_values, y_values, color="crimson", linewidth=3, linestyle="-")
+
+# # Add a color bar to show the cost_mean scale
+# sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+# sm.set_array([])
+# cbar = plt.colorbar(sm, ax=ax)
+# cbar.set_label('Cumulative energy services penalty [GWh/yr]', fontsize=14)
+# cbar.ax.tick_params(labelsize=12)
+
 # Add vertical dashed lines with annotations
-ax.axvline(x=1800, color='crimson', linestyle='--', linewidth=3, alpha=0.8)
-ax.axvline(x=10000, color='crimson', linestyle='--', linewidth=3, alpha=0.8)
+ax.axvline(x=1800, color='deepskyblue', linestyle='--', linewidth=3, alpha=0.8)
+ax.axvline(x=10000, color='deepskyblue', linestyle='--', linewidth=3, alpha=0.8)
 
 # Annotate the lines
-ax.text(1800+100, ax.get_ylim()[0] * 1.30, '2030 target', color='crimson', fontsize=14, ha='left', va='bottom')
-ax.text(10000+100, ax.get_ylim()[0] * 1.30, '2045 target (indicative)', color='crimson', fontsize=14, ha='left', va='bottom')
+ax.text(1800+100, ax.get_ylim()[0] * 1.30, '2030 target', color='deepskyblue', fontsize=14, ha='left', va='bottom')
+ax.text(10000+100, ax.get_ylim()[0] * 1.30, '2045 target (indicative)', color='deepskyblue', fontsize=14, ha='left', va='bottom')
 
 # Set the limits of the plot
 ax.set_xlim(0, x_start)
-ax.set_ylim(summary["services_5th"].min(), summary["services_95th"].max())
+ax.set_ylim(summary["services_5th"].min(), summary["services_95th"].max()+50)
 
 # # Add evenly spaced x-axis ticks and labels
 # xticks = np.linspace(0, round(x_start), num=10)
@@ -462,12 +514,9 @@ ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.9)
 ax.set_xlabel("Cumulative captured CO2 [kt/yr]", fontsize=14)
 ax.set_ylabel("Energy services penalty [kWh/tCO2]", fontsize=14)
 ax.set_title("MACC of energy services penalty", fontsize=16)
+ax2.set_ylabel('Cumulative Energy Penalty [GWh/yr]', fontsize=14, color="crimson")
 
-# Add a color bar to show the cost_mean scale
-sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-sm.set_array([])
-cbar = plt.colorbar(sm, ax=ax)
-cbar.set_label('Cumulative energy services penalty [GWh/yr]', fontsize=14)
-cbar.ax.tick_params(labelsize=12)
+ax2.tick_params(axis='y', colors='crimson')  # Color the y-axis ticks and labels red
+ax2.yaxis.label.set_color('crimson')  # Set the label color to red
 
 plt.show()

@@ -307,6 +307,7 @@ class W2E_plant:
         if not self.technology_assumptions["heat_pump"]:
             Qhp = 0
         Php = Qhp/self.technology_assumptions["COP"]
+        print(Php)
 
         self.P -= Php/1000
         self.results["Plost"] += Php/1000
@@ -536,6 +537,7 @@ def CCS_CHP(
     penalty_biomass  = CHP.results["Qextra"]          / (CHP.gases["captured_emissions"])                                       #[MWh/kt]        
 
     # CHP.print_energybalance()
+    # CHP.plot_hexchange(show=False) 
     CHP.reset()
     return capture_cost, penalty_services, penalty_biomass, costs, emissions
 
@@ -543,11 +545,11 @@ def CCS_CHP(
 if __name__ == "__main__":
 
     # Load plant data
-    plants_df = pd.read_csv("WASTE data.csv",delimiter=";")
-    plant_data = plants_df.iloc[0]
+    plants_df = pd.read_csv("WASTE data all.csv",delimiter=";")
+    plant_data = plants_df.iloc[23]
 
     # Load CHP Aspen data
-    aspen_df = pd.read_csv("MEA-chip.csv", sep=";", decimal=',')
+    aspen_df = pd.read_csv("W2E-final.csv", sep=";", decimal=',')
     aspen_interpolators = create_interpolators(aspen_df)
 
     # Initate a CHP and calculate its nominal energy balance
@@ -576,4 +578,4 @@ if __name__ == "__main__":
     capture_cost, penalty_services, penalty_biomass, costs, emissions = CCS_CHP(CHP=CHP, chp_interpolators=aspen_interpolators)
     print("Outcomes: ", capture_cost, penalty_services, penalty_biomass, costs, emissions)
 
-    # plt.show()
+    plt.show()

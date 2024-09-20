@@ -44,7 +44,7 @@ print(summary)
 color_map = {}
 color_map.update({name: 'black' for name in chp_outcomes["Name"].unique()})
 color_map.update({name: 'grey' for name in w2e_outcomes["Name"].unique()})
-color_map.update({name: 'green' for name in pulp_outcomes["Name"].unique()})
+color_map.update({name: 'mediumseagreen' for name in pulp_outcomes["Name"].unique()})
 
 # Truncate x-axis labels to a maximum of 17 characters
 def truncate_label(label, max_length=17):

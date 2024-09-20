@@ -264,39 +264,39 @@ filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
-    # 'COP': (3, 3.80),
-    # 'celc': (20, 80),
+    'COP': (3, 3.80),
+    'celc': (20, 80),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
     # 'time': (4400, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
-    # "heat_pump": [True],
+    "heat_pump": [True],
     # "duration_increase": [0]
 }
 numerical_restrictions_2 = {
     # 'COP': (3, 3.80),
-    # 'celc': (20, 74),
+    'celc': (20, 74),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.08),
+    'i': (0.05, 0.08),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
-    # "heat_pump": [True],
+    "heat_pump": [True],
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    # 'celc': (20, 73),
+    'celc': (20, 73),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.07),
+    'i': (0.05, 0.07),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
-    # "heat_pump": [True],
+    "heat_pump": [True],
     # "duration_increase": [0]
 }
 
