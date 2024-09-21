@@ -54,7 +54,7 @@ def truncate_label(label, max_length=17):
 
 # Plot the mean capture cost and percentiles on the primary y-axis
 fig, ax1 = plt.subplots(figsize=(15, 10))
-ax1.step(summary.index, summary['cost_mean'], where='mid', label='Mean capture cost [EUR/t]', marker='s', color='black', linewidth=0)
+ax1.step(summary.index, summary['cost_mean'], where='mid', label='Mean capture cost [EUR/tCO2]', marker='s', color='black', linewidth=0)
 ax1.fill_between(summary.index, summary['cost_5th'], summary['cost_95th'], step='mid', color='grey', alpha=0.2, label='5th-95th percentile range')
 
 # Perform linear regression for the mean capture cost
@@ -65,7 +65,7 @@ poly = np.poly1d(coefficients)
 ax1.plot(summary.index, poly(x), color='black', linestyle='--', label='Regression of capture cost')
 
 ax1.set_xlabel('Name')
-ax1.set_ylabel('Capture cost [EUR/t]', fontsize=14)
+ax1.set_ylabel('Capture cost [EUR/tCO2]', fontsize=14)
 ax1.set_title('Capture Cost and Energy Penalties by Plant', fontsize=14)
 # ax1.tick_params(axis='x', rotation=90)
 labels = [truncate_label(label) for label in summary.index]
@@ -79,13 +79,13 @@ ax1.set_ylim(-40, 400)
 
 # Add which secondary axes you want to plot
 ax2 = ax1.twinx()
-ax2.step(summary.index, summary['services_mean'], where='mid', label='Mean penalty energy services [GWh/yr]', marker='s', color='crimson', linewidth=0)
+ax2.step(summary.index, summary['services_mean'], where='mid', label='Mean penalty energy services [GWh p.a.]', marker='s', color='crimson', linewidth=0)
 ax2.fill_between(summary.index, summary['services_5th'], summary['services_95th'], step='mid', color='crimson', alpha=0.2, label='5th-95th percentile range')
 
-ax2.step(summary.index, summary['biomass_mean'], where='mid', label='Mean penalty biomass [GWh/yr]', marker='s', color='mediumseagreen', linewidth=0)
+ax2.step(summary.index, summary['biomass_mean'], where='mid', label='Mean penalty biomass [GWh p.a.]', marker='s', color='mediumseagreen', linewidth=0)
 ax2.fill_between(summary.index, summary['biomass_5th'], summary['biomass_95th'], step='mid', color='mediumseagreen', alpha=0.2, label='5th-95th percentile range')
 
-ax2.step(summary.index, summary['CO2_mean'], where='mid', label='Mean captured CO2 [kt/yr]', marker='s', color='deepskyblue', linewidth=0)
+ax2.step(summary.index, summary['CO2_mean'], where='mid', label='Mean captured CO2 [kt p.a.]', marker='s', color='deepskyblue', linewidth=0)
 ax2.fill_between(summary.index, summary['CO2_5th'], summary['CO2_95th'], step='mid', color='deepskyblue', alpha=0.2, label='5th-95th percentile range')
 
 ymin, ymax = ax2.get_ylim()
@@ -109,4 +109,5 @@ lines2, labels2 = ax2.get_legend_handles_labels()
 ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper center", fontsize=14)
 
 plt.tight_layout()
+fig.savefig('MACC_all.png', dpi=600)
 plt.show()

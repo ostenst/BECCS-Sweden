@@ -121,11 +121,11 @@ filtered_outcomes_low = chp_outcomes[boolean].reset_index(drop=True)
 filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 
 numerical_restrictions_1 = {
-    # 'COP': (3.26, 3.80),
-    # # 'Tlow': (43, 50.7),
+    'COP': (3.14, 3.80),
+    'celc': (20, 48),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
-    # 'time': (4841, 5999),
+    # 'time': (5305, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_1 = {
@@ -134,10 +134,10 @@ categorical_restrictions_1 = {
 }
 numerical_restrictions_2 = {
     # 'COP': (2.45, 3.80),
-    # 'celc': (23, 65),
+    'celc': (20, 67),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.077),
-    # 'time': (5381, 5999),
+    'time': (5467, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
@@ -148,14 +148,15 @@ numerical_restrictions_3 = {
     # 'COP': (2.45, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.066),
-    # 'time': (4986, 5999),
+    'i': (0.05, 0.077),
+    'time': (5375, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {
     "heat_pump": [True],
     "duration_increase": [0]
 }
+
 
 subsets = [[filtered_experiments_high,filtered_outcomes_high,numerical_restrictions_1,categorical_restrictions_1],
            [filtered_experiments_mid,filtered_outcomes_mid,numerical_restrictions_2,categorical_restrictions_2],
@@ -193,9 +194,9 @@ filtered_experiments_low = w2e_experiments[boolean].reset_index(drop=True)
 
 numerical_restrictions_1 = {
     # 'COP': (3, 3.80),
-    # 'celc': (20, 80),
+    'celc': (26, 75),
     # # 'rate': (0.78, 0.893),
-    # # 'i': (0.05, 0.10),
+    'i': (0.05, 0.08),
     # 'time': (4400, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -205,9 +206,9 @@ categorical_restrictions_1 = {
 }
 numerical_restrictions_2 = {
     # 'COP': (3, 3.80),
-    # 'celc': (20, 74),
-    # # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.08),
+    'celc': (20, 64),
+    # 'rate': (0.78, 0.893),
+    'i': (0.05, 0.074),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -216,10 +217,10 @@ categorical_restrictions_2 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    # 'celc': (20, 73),
+    'celc': (20, 62),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    # 'i': (0.05, 0.07),
+    'i': (0.05, 0.074),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -244,11 +245,10 @@ for subset in subsets:
 pulp_experiments = pd.read_csv("PULP experiments/all_experiments.csv",delimiter=",", encoding='utf-8')
 pulp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding='utf-8')
 pulp_coordinates = pd.read_csv('pulp_coordinates.csv')
-
 numerical_restrictions_1 = {
-    # 'COP': (3.28, 3.80),
-    'celc': (20, 68),
-    'rate': (0.86, 0.93),
+    'beta': (0.6, 0.65),
+    'celc': (20, 74),
+    # 'rate': (0.86, 0.93),
 }
 categorical_restrictions_1 = {
     "SupplyStrategy": ["SteamLP", "SteamHP"],
@@ -256,18 +256,18 @@ categorical_restrictions_1 = {
 }
 
 numerical_restrictions_2 = {
-    'beta': (0.6, 0.66),
-    'celc': (20, 46),
+    'beta': (0.6, 0.67),
+    'celc': (20, 51),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_2 = {
-    "SupplyStrategy": ["HeatPumps", "SteamLP"],
+    "SupplyStrategy": ["SteamLP"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_3 = {
-    'beta': (0.6, 0.69),
-    'celc': (20, 50),
+    'beta': (0.6, 0.64),
+    'celc': (20, 80),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_3 = {
@@ -276,8 +276,8 @@ categorical_restrictions_3 = {
 }
 
 numerical_restrictions_4 = {
-    'k': (-138, 156),
-    'celc': (20, 49),
+    'i': (0.05, 0.095),
+    'celc': (20, 85),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_4 = {
@@ -286,18 +286,18 @@ categorical_restrictions_4 = {
 }
 
 numerical_restrictions_5 = {
-    'i': (0.05, 0.11),
-    'celc': (24, 62),
+    'COP': (3.2, 3.8),
+    'celc': (20, 54),
     # 'BarkIncrease': (None, 61),
 }
 categorical_restrictions_5 = {
-    "SupplyStrategy": ["SteamLP"],
+    "SupplyStrategy": ["HeatPumps"],
     "BarkIncrease": [0]
 }
 
 numerical_restrictions_6 = {
     'beta': (0.6, 0.66),
-    'celc': (20, 68),
+    'celc': (20, 48),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_6 = {
@@ -306,8 +306,8 @@ categorical_restrictions_6 = {
 }
 
 numerical_restrictions_7 = {
-    'rate': (0.82, 0.85),
-    'celc': (20, 68),
+    'rate': (0.6, 0.66),
+    'celc': (20, 62),
     # 'BarkIncrease': (None, 31),
 }
 categorical_restrictions_7 = {
@@ -423,9 +423,9 @@ for i, name in enumerate(summary.index):
     if type_i == "chp":
         type_color = "black"
     elif type_i == "w2e":
-        type_color = "grey"
+        type_color = "black"
     else:
-        type_color = "mediumseagreen"
+        type_color = "black"
 
     x_end = x_start + CO2_mean
 
@@ -489,8 +489,8 @@ ax.axvline(x=1800, color='deepskyblue', linestyle='--', linewidth=3, alpha=0.8)
 ax.axvline(x=10000, color='deepskyblue', linestyle='--', linewidth=3, alpha=0.8)
 
 # Annotate the lines
-ax.text(1800+100, ax.get_ylim()[0] * 1.30, '2030 target', color='deepskyblue', fontsize=14, ha='left', va='bottom')
-ax.text(10000+100, ax.get_ylim()[0] * 1.30, '2045 target (indicative)', color='deepskyblue', fontsize=14, ha='left', va='bottom')
+ax.text(1800+100, ax.get_ylim()[1] * 0.90, '2030 target', color='deepskyblue', fontsize=14, ha='left', va='bottom')
+ax.text(10000+100, ax.get_ylim()[1] * 0.90, '2045 target (indicative)', color='deepskyblue', fontsize=14, ha='left', va='bottom')
 
 # Set the limits of the plot
 ax.set_xlim(0, x_start)
@@ -505,12 +505,13 @@ ax.set_ylim(summary["services_5th"].min(), summary["services_95th"].max()+50)
 ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.9)
 
 # Customize the plot
-ax.set_xlabel("Cumulative captured CO2 [kt/yr]", fontsize=14)
+ax.set_xlabel("Cumulative captured CO2 [kt p.a.]", fontsize=14)
 ax.set_ylabel("Energy services penalty [kWh/tCO2]", fontsize=14)
-ax.set_title("MACC of energy services penalty", fontsize=16)
-ax2.set_ylabel('Cumulative Energy Penalty [GWh/yr]', fontsize=14, color="crimson")
+ax.set_title("MACC of energy services penalty", fontsize=14)
+ax2.set_ylabel('Cumulative energy services penalty [GWh p.a.]', fontsize=14, color="crimson")
 
 ax2.tick_params(axis='y', colors='crimson')  # Color the y-axis ticks and labels red
 ax2.yaxis.label.set_color('crimson')  # Set the label color to red
 
+fig.savefig('MACC_penalty.png', dpi=600)
 plt.show()
