@@ -91,7 +91,7 @@ ax2.fill_between(summary.index, summary['CO2_5th'], summary['CO2_95th'], step='m
 ymin, ymax = ax2.get_ylim()
 # ax2.set_ylim(ymin + 600, ymax + 600)
 ax2.set_ylim(-160, 1600)
-ax2.set_ylabel('Penalty Services/Biomass', fontsize=14)
+ax2.set_ylabel('Capacity in [GWh p.a.] or [ktCO2 p.a.]', fontsize=14)
 ax2.tick_params(axis='y', labelsize=12)
 
 # Color code x-axis labels
