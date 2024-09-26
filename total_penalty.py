@@ -194,7 +194,7 @@ filtered_experiments_low = w2e_experiments[boolean].reset_index(drop=True)
 
 numerical_restrictions_1 = {
     # 'COP': (3, 3.80),
-    'celc': (26, 75),
+    'celc': (20, 54),
     # # 'rate': (0.78, 0.893),
     'i': (0.05, 0.08),
     # 'time': (4400, 5999),
@@ -217,10 +217,10 @@ categorical_restrictions_2 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'celc': (20, 62),
+    'celc': (20, 68),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.074),
+    'i': (0.05, 0.072),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -465,7 +465,7 @@ for i, name in enumerate(summary.index):
         print("Cumulative ES penalty in 2045 [GWh/yr] =", color_95th)
         target_count += 1
 
-    if x_end > 20000 and target_count < 3:
+    if x_end > 19000 and target_count < 3:
         print("Cumulative ES penalty @>20 Mt [GWh/yr] =", color_5th)
         print("Cumulative ES penalty @>20 Mt [GWh/yr] =", color_mean)
         print("Cumulative ES penalty @>20 Mt [GWh/yr] =", color_95th)

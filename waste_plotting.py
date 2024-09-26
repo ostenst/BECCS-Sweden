@@ -228,8 +228,8 @@ categorical_restrictions = {
 #     'penalty_biomass': 500
 # }
 satisficing_thresholds_2 = {
-    'capture_cost': 100,
-    'penalty_services': 350,
+    'capture_cost': 120,
+    'penalty_services': 450,
     'penalty_biomass': 1
 }
 # satisficing_thresholds_3 = {
@@ -261,12 +261,12 @@ filtered_experiments_low = chp_experiments[boolean].reset_index(drop=True)
 
 # # plot_everything(filtered_experiments, filtered_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
 # plot_everything(chp_experiments, chp_outcomes, chp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_1)
-# plot_everything(w2e_experiments, w2e_outcomes, w2e_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_2)
+plot_everything(w2e_experiments, w2e_outcomes, w2e_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_2)
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
     # 'COP': (3, 3.80),
-    'celc': (26, 75),
+    'celc': (20, 54),
     # # 'rate': (0.78, 0.893),
     'i': (0.05, 0.08),
     # 'time': (4400, 5999),
@@ -289,10 +289,10 @@ categorical_restrictions_2 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'celc': (20, 62),
+    'celc': (20, 68),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.074),
+    'i': (0.05, 0.072),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }

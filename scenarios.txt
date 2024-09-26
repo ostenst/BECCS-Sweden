@@ -50,30 +50,30 @@ time       5375.459488  5999.916087  2.296474e-309      NaN
 
 -------------------------------------------------------------------------
 
-W2E should settle for these criteria: y = (filtered_outcomes["capture_cost"] < 100) & (filtered_outcomes["penalty_services"] < 350) & (filtered_outcomes["penalty_biomass"] < 1)
+W2E should settle for these criteria: y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 450) & (filtered_outcomes["penalty_biomass"] < 1)
 WASTE1
-Plants above 350kt
-             box 19
-                min        max  qp value       qp value
-i          0.050001   0.082377       NaN  2.403470e-174
-heat_pump    {True}     {True}  0.000000            NaN
-celc       26.39939  75.570204  0.448662  1.053206e-280
+Plants above 250kt
+              box 22
+                 min        max       qp value       qp value
+celc       20.009733  54.391649            NaN   0.000000e+00
+i           0.050071   0.082367            NaN  1.861535e-134
+heat_pump     {True}     {True}  4.580152e-308            NaN
 
-Plants between 150-350kt
+Plants between 125-250kt
 WASTE2
               box 22
                  min        max qp value qp value
-celc       20.009665  63.894748      NaN      0.0
-i           0.050008   0.074682      NaN      0.0
+celc       20.001911  64.745627      NaN      0.0
+i           0.050022    0.07436      NaN      0.0
 heat_pump     {True}     {True}      0.0      NaN
 
-Plants below 150kt
+Plants below 125kt
 WASTE3
               box 22
-                 min        max qp value       qp value
-i           0.050021   0.074159      NaN   0.000000e+00
-celc       20.019866  62.109761      NaN  2.797249e-291
-heat_pump     {True}     {True}      0.0            NaN
+                 min        max qp value qp value
+celc       20.022792  68.542854      NaN      0.0
+i           0.050019   0.071861      NaN      0.0
+heat_pump     {True}     {True}      0.0      NaN
 
 -------------------------------------------------------------------------
 

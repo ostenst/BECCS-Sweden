@@ -128,7 +128,7 @@ class W2E_plant:
         V_fluegas = n_fluegas * 22.414                                 #[Nm3/s]  Using molar volume of ideal gas
 
         # Now calculating CO2 from %CO2
-        V_CO2 = V_fluegas*0.16  #[m3CO2/s]
+        V_CO2 = V_fluegas*0.11  #[m3CO2/s]
         n_CO2 = V_CO2/22.414    #[kmolCO2/s]
         m_CO2 = n_CO2*44        #[kg/s]
 
