@@ -39,9 +39,10 @@ filtered_experiments = chp_experiments[boolean].reset_index(drop=True)
 
 # Define X and Y
 x = filtered_experiments.iloc[:, 0:26]
-names_list = ['rate', 'duration_increase', 'time', 'heat_pump']  # This is essentially "constrained PRIM"
-x = x[names_list]
-y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 350) & (filtered_outcomes["penalty_biomass"] < 500)
+# # names_list = ['rate', 'duration_increase', 'time', 'heat_pump', 'Tlow']  # This is essentially "constrained PRIM"
+# names_list = ['rate', 'duration_increase', 'time']  # This is essentially "constrained PRIM"
+# x = x[names_list]
+y = (filtered_outcomes["capture_cost"] < 120) & (filtered_outcomes["penalty_services"] < 450) & (filtered_outcomes["penalty_biomass"] < 500)
 print(y.sum(),"scenarios are satisficing out of", len(y))
 
 prim_alg = prim.Prim(x, y, threshold=0.8, peel_alpha=0.1) # Threshold was 0.8 before (Kwakkel) #NOTE: To avoid deprecated error, I replaced line 1506 in prim.py with: np.int(paste_value) => int(paste_value)
