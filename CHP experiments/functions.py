@@ -181,7 +181,7 @@ class CHP_plant:
         TCCS = MEA.get("Treb") + dTreb
         pCCS = steamTable.psat_t(TCCS)
         # Ta = steamTable.t_ps(pCCS,A.s)
-        a = State("a",pCCS,s=A.s,mix=True) #NOTE: Debug? If mixed! You need to add a case if we are outside (in gas phase)
+        a = State("a",pCCS,s=A.s,mix=True) 
         d = State("d",pCCS,satL=True)
         mCCS = MEA.get("Qreb") / (a.h-d.h)
         mB = mtot-mCCS
@@ -220,29 +220,6 @@ class MEA_plant:
         return self.data[parameter].values[0]
 
     def estimate_size(self, interpolations, Aspen_data):
-        # df = Aspen_data #TODO: Move this outside of RDM loop? NO. We can't, since burn_fuel() relies on our technology_assumptions
-        # X = df[['CO2%', 'Flow']]
-        # y = df.drop(columns=['CO2%', 'Flow'])
-
-        # model = MultiOutputRegressor(LinearRegression())
-        # model.fit(X, y)
-
-        # # NOTE: THE BELOW FOUR ROWS WORKED FOR OLD W2E REGRESSION WHERE "CO2%" and "Flow" WAS USED
-        # y = Aspen_data.drop(columns=['CO2%', 'Flow']) # Need to keep this, to be able to name the columns of predicted_df
-    
-        # # print("Estimated flue gas volume: ", self.host.Vfg, " [m3/h], or ", self.host.Vfg/3600*0.8, " [kg/s]" )
-        # new_input = pd.DataFrame({'CO2%': [self.host.fCO2*100], 'Flow': [self.host.Vfg/3600*0.8]})  # Fraction of CO2=>percentage, and massflow [kg/s], of flue gases
-
-        # y = Aspen_data.drop(columns=['CO2', 'Flow', 'Rcapture']) 
-        # new_input = pd.DataFrame({'CO2': [self.host.fCO2*100], 'Flow': [self.host.Vfg/3600*0.8], 'Rcapture': [self.rate]})
-
-        # predicted_y = model.predict(new_input)
-        # predicted_df = pd.DataFrame(predicted_y, columns=y.columns)
-
-        # print("MEA plant is this big, after assuming densityFG = 0.8kg/m3: ")
-        # print(predicted_df.head())
-        # self.data = predicted_df
-        # return 
         
         # Initialize a dictionary to store new y values for each column
         new_Flow = [self.host.Vfg/3600*0.8]
@@ -342,7 +319,7 @@ class MEA_plant:
         # Finding low and high points:
         def linear_interpolation(curve, ynew):
             # Find the nearest points
-            y_values = [point[1] for point in curve]    # NOTE: I think this is buggy for unfeasible composite curves, i.e. when some Qcool approach zero and we have weirds "kinks" in the composite curve
+            y_values = [point[1] for point in curve]    
             nearest_index = min(range(len(y_values)), key=lambda i: abs(y_values[i] - ynew))
             x1, y1 = curve[nearest_index]
             if nearest_index == 0:

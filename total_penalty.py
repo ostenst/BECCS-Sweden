@@ -3,62 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# def filter_dataframes(experiments_df, outcomes_df, conditions, categorical_conditions=None):
-#     """
-#     Filters the experiments and outcomes dataframes based on the specified conditions applied to the experiments dataframe.
-
-#     Parameters:
-#     experiments_df (pd.DataFrame): The experiments dataframe to be filtered.
-#     outcomes_df (pd.DataFrame): The outcomes dataframe to be filtered.
-#     conditions (dict): A dictionary where keys are column names and values are tuples of the form (min_value, max_value).
-#                        Use None for no limit on min_value or max_value.
-#     categorical_conditions (dict): A dictionary where keys are column names and values are lists of allowed categories.
-
-#     Returns:
-#     pd.DataFrame, pd.DataFrame: Two dataframes filtered based on the conditions - the experiments and outcomes dataframes.
-#     """
-#     # Build the query string for numerical conditions
-#     query = []
-#     for column, (min_value, max_value) in conditions.items():
-#         if min_value is not None:
-#             query.append(f"{column} >= {min_value}")
-#         if max_value is not None:
-#             query.append(f"{column} <= {max_value}")
-    
-#     # Apply numerical conditions
-#     if query:
-#         query_string = " & ".join(query)
-#         filtered_experiments_df = experiments_df.query(query_string)
-#     else:
-#         filtered_experiments_df = experiments_df
-
-#     # Apply categorical conditions
-#     if categorical_conditions:
-#         for column, allowed_values in categorical_conditions.items():
-#             filtered_experiments_df = filtered_experiments_df[filtered_experiments_df[column].isin(allowed_values)]
-
-#     # Filter outcomes dataframe based on the filtered experiments dataframe
-#     filtered_outcomes_df = outcomes_df.loc[filtered_experiments_df.index]
-    
-#     if filtered_experiments_df.empty:
-#         print("Filtered dataframe is empty")
-#     print("Removed ", len(experiments_df)-len(filtered_experiments_df),"or", (len(experiments_df)-len(filtered_experiments_df))/len(experiments_df)*100, " percent of total scenarios")
-#     return filtered_experiments_df, filtered_outcomes_df
-
 def filter_dataframes(experiments_df, outcomes_df, conditions, categorical_conditions=None):
-    """
-    Filters the experiments and outcomes dataframes based on the specified conditions applied to the experiments dataframe.
 
-    Parameters:
-    experiments_df (pd.DataFrame): The experiments dataframe to be filtered.
-    outcomes_df (pd.DataFrame): The outcomes dataframe to be filtered.
-    conditions (dict): A dictionary where keys are column names and values are tuples of the form (min_value, max_value).
-                       Use None for no limit on min_value or max_value.
-    categorical_conditions (dict): A dictionary where keys are column names and values are lists of allowed categories.
-
-    Returns:
-    pd.DataFrame, pd.DataFrame: Two dataframes filtered based on the conditions - the experiments and outcomes dataframes.
-    """
     # Build the query string for numerical conditions
     query = []
     for column, (min_value, max_value) in conditions.items():

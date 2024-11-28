@@ -276,7 +276,7 @@ class CHP_plant:
         differences = np.diff(distances)
         max_curvature_index = np.argmax(differences) + 1
 
-        # Finding low and high points. NOTE I think this is buggy for unfeasible, kinked composite curves
+        # Finding low and high points.
         def linear_interpolation(curve, ynew):
             # Find the nearest points, then perform inverse linear interpolation
             y_values = [point[1] for point in curve]    
@@ -294,14 +294,14 @@ class CHP_plant:
             else:
                 return x1 + (x2 - x1) * (ynew - y1) / (y2 - y1)
         
-        Qsupp = linear_interpolation(curve, 86) # BUG: Hard-coded Tsupp=86C since higher temp. heat won't be available
+        Qsupp = linear_interpolation(curve, 86) 
         Qlow = linear_interpolation(curve, Tlow)
         Qpinch, Tpinch = curve[max_curvature_index][0], curve[max_curvature_index][1]
         if Qlow < Qpinch:
             Qlow = Qpinch # Sometimes Qlow is poorly estimated, then just set the low grade heat to zero
         Qhex = (Qpinch-Qsupp) + (Qlow-Qpinch)
 
-        # Qhp = composite_curve[-1][0] - Qlow # BUG: This overestimates Qhp for smaller plants where the composite curve is less accurate
+        # Qhp = composite_curve[-1][0] - Qlow # This overestimates Qhp for smaller plants where the composite curve is less accurate
         Qmax_beiron = self.get("Qreb")*1.18 # Assumptions from (Beiron, 2022)
         Qhp = Qmax_beiron - Qlow
         if not self.technology_assumptions["heat_pump"]:

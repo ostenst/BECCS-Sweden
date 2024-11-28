@@ -158,16 +158,6 @@ class PulpPlant:
             "V_fluegas": V_fluegas                                                      #[Nm3/s]
         }
 
-    # def size_MEA(self, rate, pulp_interpolation): 
-    #     print(" I need to replace this MEA sizing function with the new one. I thus need to figure out how the function outputs (Qreb, Wtot and makeup) are used")       
-    #     # print("Making a simplified MEA calculation for now, but an Aspen interpolator is required!")
-    #     Q_reboiler = 3.6 * (self.gases["recovery_emissions"]*1000 * rate) /3.6 #[MWh/yr]
-    #     print(Q_reboiler, " is the reboiler duty!")
-    #     W_captureplant = 0.15*Q_reboiler
-
-    #     self.results["Q_reboiler"] = Q_reboiler
-    #     self.results["W_captureplant"] = W_captureplant
-
     def size_MEA(self, rate, pulp_interpolations):  
         new_Flow = self.gases["m_fluegas"]  #[kg/s]
         if new_Flow < 50:                    #The CHP interpolators only work between 50 kg/s / above 400kgs
@@ -266,7 +256,7 @@ class PulpPlant:
     def recover_and_supplement(self):
         # Recover excess heat using pumps, supply residual demand with merit ordered steam
         Q_60C = (self.technology_assumptions["k"] + self.technology_assumptions["m"]*self.pulp_capacity/1000)*1000 #[MWh/yr]
-        P_HP = Q_60C/self.technology_assumptions["COP"] #NOTE ATT THIS NOTE NOTE NOTE
+        P_HP = Q_60C/self.technology_assumptions["COP"] 
         remaining_demand = self.results["Q_reboiler"] - Q_60C
 
         time = self.energybalance_assumptions["time"]

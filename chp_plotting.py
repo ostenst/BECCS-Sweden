@@ -8,19 +8,7 @@ import matplotlib.cm as cm
 import random
 
 def filter_dataframes(experiments_df, outcomes_df, conditions, categorical_conditions=None):
-    """
-    Filters the experiments and outcomes dataframes based on the specified conditions applied to the experiments dataframe.
 
-    Parameters:
-    experiments_df (pd.DataFrame): The experiments dataframe to be filtered.
-    outcomes_df (pd.DataFrame): The outcomes dataframe to be filtered.
-    conditions (dict): A dictionary where keys are column names and values are tuples of the form (min_value, max_value).
-                       Use None for no limit on min_value or max_value.
-    categorical_conditions (dict): A dictionary where keys are column names and values are lists of allowed categories.
-
-    Returns:
-    pd.DataFrame, pd.DataFrame: Two dataframes filtered based on the conditions - the experiments and outcomes dataframes.
-    """
     # Build the query string for numerical conditions
     query = []
     for column, (min_value, max_value) in conditions.items():
@@ -85,7 +73,7 @@ def plot_satisficing(outcomes_df, thresholds):
     filtered_df = outcomes_df[mask]
 
     # Apply the mask and group by 'Name' to count rows meeting all conditions
-    grouped_nominal_mean = outcomes_df.groupby('Name')['gross'].mean() #NOTE: this should maybe be calculated on the outcomes_df instead? Before masking.
+    grouped_nominal_mean = outcomes_df.groupby('Name')['gross'].mean() 
     grouped = filtered_df.groupby('Name').size()
     grouped_df = grouped.reset_index(name='Satisficing')
 
@@ -310,7 +298,6 @@ for subset in subsets:
     satisficing_combined = pd.concat([satisficing_combined, satisficing_df]).drop_duplicates(subset='Name')
 
 plot_densitymap(satisficing_combined, chp_coordinates)
-
 
 # plt.figure(figsize=(10, 6))
 # gross_means.plot(kind='bar')

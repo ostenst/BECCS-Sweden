@@ -38,7 +38,7 @@ for index, plant_data in plants_df.iterrows():
         "heat_intensity": 11,           #[GJ/t]
         "electricity_intensity": 0.7,   #[MWh/t]
         "condensing_pressure": 0.1,     #[bar]
-        "time": 8000                    #[h/yr] NOTE: This cannot be an uncertainty as we are hard-coding the pulp capacities [t/yr], and this capacity determines A LOT!
+        "time": 8000                    #[h/yr]
     }
 
     pulp_plant = PulpPlant(

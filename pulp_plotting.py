@@ -85,7 +85,7 @@ def plot_satisficing(outcomes_df, thresholds):
     filtered_df = outcomes_df[mask]
 
     # Apply the mask and group by 'Name' to count rows meeting all conditions
-    grouped_nominal_mean = outcomes_df.groupby('Name')['gross'].mean() #NOTE: this should maybe be calculated on the outcomes_df instead? Before masking.
+    grouped_nominal_mean = outcomes_df.groupby('Name')['gross'].mean() 
     grouped = filtered_df.groupby('Name').size()
     grouped_df = grouped.reset_index(name='Satisficing')
 
