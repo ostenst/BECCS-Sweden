@@ -67,9 +67,11 @@ def plot_satisficing(outcomes_df, thresholds):
     total = outcomes_df.groupby('Name').size()
     total = total.reset_index(name='Total')
 
-    mask = (outcomes_df['capture_cost'] < thresholds['capture_cost']) & \
-           (outcomes_df['penalty_services'] < thresholds['penalty_services']) & \
-           (outcomes_df['penalty_biomass'] < thresholds['penalty_biomass'])
+    # mask = (outcomes_df['capture_cost'] < thresholds['capture_cost']) & \
+    #        (outcomes_df['penalty_services'] < thresholds['penalty_services']) & \
+    #        (outcomes_df['penalty_biomass'] < thresholds['penalty_biomass'])
+    mask = (outcomes_df['NPV'] > 0) # NOTE: New mask for NPV>0 analysis!
+
     filtered_df = outcomes_df[mask]
 
     # Apply the mask and group by 'Name' to count rows meeting all conditions
@@ -124,7 +126,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     cmap = plt.colormaps.get_cmap('RdYlGn')
 
     for idx, row in coordinates_gdf.iterrows():
-        radius_x = row['Gross CO2'] / 750
+        radius_x = row['Gross CO2'] / 400
         radius_y = radius_x / 2.1     # Hard coding this seems to work...
 
         color = cmap(row['Density'])
@@ -250,8 +252,8 @@ plot_everything(chp_experiments, chp_outcomes, chp_coordinates, numerical_restri
 # plot_everything(pulp_experiments, pulp_outcomes, pulp_coordinates, numerical_restrictions, categorical_restrictions, satisficing_thresholds_3)
 
 numerical_restrictions_1 = {
-    'COP': (3.14, 3.80),
-    'celc': (20, 48),
+    # 'COP': (3.14, 3.80),
+    # 'celc': (20, 48),
     # # 'rate': (0.78, 0.893),
     # # 'i': (0.05, 0.10),
     # 'time': (5305, 5999),
@@ -263,10 +265,10 @@ categorical_restrictions_1 = {
 }
 numerical_restrictions_2 = {
     # 'COP': (2.45, 3.80),
-    'celc': (20, 67),
+    # 'celc': (20, 67),
     # 'rate': (0.78, 0.893),
     # 'i': (0.05, 0.077),
-    'time': (5467, 5999),
+    # 'time': (5467, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_2 = {
@@ -277,8 +279,8 @@ numerical_restrictions_3 = {
     # 'COP': (2.45, 3.80),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.077),
-    'time': (5375, 5999),
+    # 'i': (0.05, 0.077),
+    # 'time': (5375, 5999),
     # "duration_increase": (None, 1001)
 }
 categorical_restrictions_3 = {

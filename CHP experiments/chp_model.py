@@ -461,7 +461,9 @@ def CCS_CHP(
     heat_pump=True,
 
     chp_interpolators=None,
-    CHP=None
+    CHP=None,
+    cTS=100, #EUR/t
+    CDR=163 #EUR/t
 ):
     technology_assumptions = {
         'U': U,
@@ -513,6 +515,13 @@ def CCS_CHP(
     CAPEX, aCAPEX, fixed_OPEX = CHP.CAPEX_MEA(economic_assumptions, escalate=True)
     energy_OPEX, other_OPEX = CHP.OPEX_MEA(economic_assumptions)
 
+    NPV = 0
+    for n in range(0,t):
+        cost_n = fixed_OPEX + energy_OPEX + other_OPEX      #[kEUR/yr], I believe energy_OPEX can be negative i.e. a revenue
+        cost_n += CHP.gases["captured_emissions"] * cTS     #[kEUR/yr] from transport and storage
+        revenue_n = CHP.gases["captured_emissions"] * CDR   #[kEUR/yr] from CRC units
+        NPV += (revenue_n - cost_n) / ((1 + i)**n)
+
     costs = [
         ["CAPEX",       CAPEX], 
         ["aCAPEX",      aCAPEX], 
@@ -539,7 +548,7 @@ def CCS_CHP(
     # CHP.print_energybalance()
     # CHP.plot_hexchange(show=False) 
     CHP.reset()
-    return capture_cost, penalty_services, penalty_biomass, costs, emissions
+    return capture_cost, penalty_services, penalty_biomass, NPV, costs, emissions
 
 
 if __name__ == "__main__":
@@ -575,7 +584,7 @@ if __name__ == "__main__":
     CHP.print_energybalance()
 
     # The RDM evaluation starts below:
-    capture_cost, penalty_services, penalty_biomass, costs, emissions = CCS_CHP(CHP=CHP, chp_interpolators=aspen_interpolators)
-    print("Outcomes: ", capture_cost, penalty_services, penalty_biomass, costs, emissions)
+    capture_cost, penalty_services, penalty_biomass, NPV, costs, emissions = CCS_CHP(CHP=CHP, chp_interpolators=aspen_interpolators)
+    print("Outcomes: ", capture_cost, penalty_services, penalty_biomass, NPV, costs, emissions)
 
     plt.show()

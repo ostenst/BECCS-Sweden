@@ -79,9 +79,11 @@ def plot_satisficing(outcomes_df, thresholds):
     total = outcomes_df.groupby('Name').size()
     total = total.reset_index(name='Total')
 
-    mask = (outcomes_df['capture_cost'] < thresholds['capture_cost']) & \
-           (outcomes_df['penalty_services'] < thresholds['penalty_services']) & \
-           (outcomes_df['penalty_biomass'] < thresholds['penalty_biomass'])
+    # mask = (outcomes_df['capture_cost'] < thresholds['capture_cost']) & \
+    #        (outcomes_df['penalty_services'] < thresholds['penalty_services']) & \
+    #        (outcomes_df['penalty_biomass'] < thresholds['penalty_biomass'])
+    mask = (outcomes_df["NPV"] > 0) # NOTE: NEW MASK FOR NPV STUFF
+    
     filtered_df = outcomes_df[mask]
 
     # Apply the mask and group by 'Name' to count rows meeting all conditions
@@ -136,7 +138,7 @@ def plot_densitymap(satisficing_df, coordinates_df):
     cmap = plt.colormaps.get_cmap('RdYlGn')
 
     for idx, row in coordinates_gdf.iterrows():
-        radius_x = row['Gross CO2'] / 750
+        radius_x = row['Gross CO2'] / 400
         radius_y = radius_x / 2.1     # Hard coding this seems to work...
 
         color = cmap(row['Density'])
@@ -266,9 +268,9 @@ plot_everything(w2e_experiments, w2e_outcomes, w2e_coordinates, numerical_restri
 
 numerical_restrictions_1 = {
     # 'COP': (3, 3.80),
-    'celc': (20, 54),
+    # 'celc': (20, 54),
     # # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.08),
+    # 'i': (0.05, 0.08),
     # 'time': (4400, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -278,9 +280,9 @@ categorical_restrictions_1 = {
 }
 numerical_restrictions_2 = {
     # 'COP': (3, 3.80),
-    'celc': (20, 64),
+    # 'celc': (20, 64),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.074),
+    # 'i': (0.05, 0.074),
     # 'time': (4822, 5999),
     # "duration_increase": (None, 1001)
 }
@@ -289,10 +291,10 @@ categorical_restrictions_2 = {
     # "duration_increase": [0]
 }
 numerical_restrictions_3 = {
-    'celc': (20, 68),
+    # 'celc': (20, 68),
     # 'Tsupp': (83, 100),
     # 'rate': (0.78, 0.893),
-    'i': (0.05, 0.072),
+    # 'i': (0.05, 0.072),
     # 'time': (4200, 5999),
     # "duration_increase": (None, 1001)
 }

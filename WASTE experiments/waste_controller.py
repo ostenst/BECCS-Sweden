@@ -86,12 +86,15 @@ for index, plant_data in plants_df.iterrows():
         ScalarOutcome("capture_cost", ScalarOutcome.MINIMIZE),
         ScalarOutcome("penalty_services", ScalarOutcome.MINIMIZE),
         ScalarOutcome("penalty_biomass", ScalarOutcome.MINIMIZE),
+        ScalarOutcome("NPV", ScalarOutcome.MAXIMIZE),
         ArrayOutcome("costs"),
         ArrayOutcome("emissions"),
     ]
     model.constants = [
         Constant("chp_interpolators", aspen_interpolators),
         Constant("CHP", CHP),
+        Constant("cTS", 100),
+        Constant("CDR", 163),
     ]
 
     ema_logging.log_to_stderr(ema_logging.INFO)
