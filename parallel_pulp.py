@@ -249,33 +249,34 @@ from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 import matplotlib.cm as cm  # Import colormap functions
 
 # Load datasets
-chp_experiments = pd.read_csv("CHP experiments/all_experiments.csv", delimiter=",", encoding="utf-8")
-chp_outcomes = pd.read_csv("CHP experiments/all_outcomes.csv", delimiter=",", encoding="utf-8")
+chp_experiments = pd.read_csv("PULP experiments/all_experiments.csv", delimiter=",", encoding="utf-8")
+chp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", encoding="utf-8")
 
 # Filter data for the specific Name
-filtered_experiments = chp_experiments[chp_experiments["Name"] == "Vartaverket KVV 8 "]
-filtered_outcomes = chp_outcomes[chp_experiments["Name"] == "Vartaverket KVV 8 "]
+filtered_experiments = chp_experiments[chp_experiments["Name"] == "Ostrand"]
+filtered_outcomes = chp_outcomes[chp_experiments["Name"] == "Ostrand"]
 
 # Ensure dataframes are aligned by index
 filtered_outcomes = filtered_outcomes.loc[filtered_experiments.index]
 
 # Add the 'rate' column from experiments to outcomes
 filtered_outcomes['rate'] = filtered_experiments['rate']
-filtered_outcomes['duration_increase'] = filtered_experiments['duration_increase']
-filtered_outcomes['heat_pump'] = filtered_experiments['heat_pump']
-filtered_outcomes['time'] = filtered_experiments['time']
+filtered_outcomes['beta'] = filtered_experiments['beta']
+# filtered_outcomes['duration_increase'] = filtered_experiments['duration_increase']
+filtered_outcomes['SupplyStrategy'] = filtered_experiments['SupplyStrategy']
+filtered_outcomes['BarkIncrease'] = filtered_experiments['BarkIncrease']
 filtered_outcomes['celc'] = filtered_experiments['celc']
 
 # Select columns to plot
-numerical_columns = ['capture_cost', 'penalty_services', 'penalty_biomass', 'rate']
+numerical_columns = ['capture_cost', 'penalty_services', 'penalty_biomass']
 # numerical_columns = ['capture_cost', 'penalty_services', 'penalty_biomass', 'time', 'celc']
-categorical_columns = ['duration_increase', 'heat_pump']
-# categorical_columns = ['duration_increase']
+# categorical_columns = ['duration_increase', 'heat_pump']
+categorical_columns = ['SupplyStrategy']
 
 # Normalize numerical values using MinMaxScaler
 scaler = MinMaxScaler()
 data_scaled_numerical = pd.DataFrame(scaler.fit_transform(filtered_outcomes[numerical_columns]), columns=numerical_columns)
-viridis = cm.get_cmap('inferno')
+viridis = cm.get_cmap('cividis')
 
 # capture_costs = filtered_outcomes['capture_cost']
 # capture_costs_norm = (capture_costs - capture_costs.min()) / (capture_costs.max() - capture_costs.min())  # Normalize 0-1
@@ -291,18 +292,26 @@ categorical_scaled = pd.DataFrame(scaler.fit_transform(categorical_data), column
 # Combine numerical and categorical data into one dataframe
 data_scaled = pd.concat([data_scaled_numerical, categorical_scaled], axis=1)
 
-# Define color function (adjust this condition as needed)
 def get_color(row):
-    if row['duration_increase'] == 2000:  
-        return viridis(0.0), 0.4
-    elif row['duration_increase'] == 1000: 
-        return viridis(0.5), 0.4
-    else:
-        return viridis(0.9), 0.4
-    # if row['duration_increase'] == 1000 and row['heat_pump'] == True:  
-    #     return viridis(0.5), 0.9
+    # General results
+    if row['SupplyStrategy'] == "SteamHP" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
+        return "crimson", 1
+    elif row['SupplyStrategy'] == "SteamHP" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
+        return "crimson", 0.05
+    elif row['SupplyStrategy'] == "SteamLP" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
+        return "deepskyblue", 1
+    elif row['SupplyStrategy'] == "SteamLP" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
+        return "deepskyblue", 0.05
+    elif row['SupplyStrategy'] == "HeatPumps" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
+        return "mediumseagreen", 1
+    elif row['SupplyStrategy'] == "HeatPumps" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
+        return "mediumseagreen", 0.05 
+
+    # SD results
+    # if row['celc']<74 and row['SupplyStrategy']=="SteamLP" and (row['BarkIncrease']==0):
+    #     return "deepskyblue", 1
     # else:
-    #     return "grey", 0.4
+    #     return "grey", 0.1
 
 # Generate colors based on conditions
 colors = [get_color(row) for _, row in filtered_outcomes.iterrows()]
@@ -324,7 +333,8 @@ for i, column in enumerate(data_scaled.columns):
         tick_positions = np.linspace(0, 1, 4)  # Normalized positions
 
         for pos, val in zip(tick_positions, tick_values):
-            ax.text(i, pos, f"{val:.1f}", ha='center', va='center', fontsize=10, color='black')
+            ax.text(i-0.1, pos, f"{int(round(val))}", ha='center', va='center', fontsize=10, color='black')
+            ax.plot([i - 0.025, i + 0.025], [pos, pos], color='black', linewidth=1)  # Small horizontal tick
     ax.plot([i, i], [0, 1], color='black', linestyle='-', alpha=1)
 
 # Add x-axis labels
@@ -336,7 +346,12 @@ for spine in ax.spines.values():
     spine.set_visible(False)
 
 ax.set_ylabel("Normalized Scale")
-ax.set_title("Parallel Coordinates Plot for CHP Outcomes")
+ax.set_title("Parallel Coordinates Plot for PULP Outcomes")
+# Remove y-axis completely
+ax.set_ylabel("")      # Remove the y-axis label
+ax.set_yticks([])      # Remove y-axis tick marks
+ax.spines['left'].set_visible(False)  # Hide the left spine (axis line)
 
+plt.savefig("parallel_pulp.png", dpi=600, bbox_inches='tight')
 plt.show()
 
