@@ -256,6 +256,13 @@ chp_outcomes = pd.read_csv("PULP experiments/all_outcomes.csv", delimiter=",", e
 filtered_experiments = chp_experiments[chp_experiments["Name"] == "Ostrand"]
 filtered_outcomes = chp_outcomes[chp_experiments["Name"] == "Ostrand"]
 
+# --- NEW: Randomly sample a hardcoded fraction of data ---
+fraction_to_plot = 0.7  # Plot only 60% of rows
+ostr_indices = chp_experiments[chp_experiments["Name"] == "Ostrand"].index
+sampled_indices = np.random.choice(ostr_indices, size=int(len(ostr_indices) * fraction_to_plot), replace=False)
+filtered_experiments = chp_experiments.loc[sampled_indices]
+filtered_outcomes = chp_outcomes.loc[sampled_indices]
+
 # Ensure dataframes are aligned by index
 filtered_outcomes = filtered_outcomes.loc[filtered_experiments.index]
 
@@ -294,24 +301,24 @@ data_scaled = pd.concat([data_scaled_numerical, categorical_scaled], axis=1)
 
 def get_color(row):
     # General results
-    if row['SupplyStrategy'] == "SteamHP" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
-        return "crimson", 1
-    elif row['SupplyStrategy'] == "SteamHP" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
-        return "crimson", 0.05
-    elif row['SupplyStrategy'] == "SteamLP" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
-        return "deepskyblue", 1
-    elif row['SupplyStrategy'] == "SteamLP" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
-        return "deepskyblue", 0.05
-    elif row['SupplyStrategy'] == "HeatPumps" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
-        return "mediumseagreen", 1
-    elif row['SupplyStrategy'] == "HeatPumps" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
-        return "mediumseagreen", 0.05 
+    # if row['SupplyStrategy'] == "SteamHP" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
+    #     return "crimson", 1
+    # elif row['SupplyStrategy'] == "SteamHP" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
+    #     return "crimson", 0.05
+    # elif row['SupplyStrategy'] == "SteamLP" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
+    #     return "deepskyblue", 1
+    # elif row['SupplyStrategy'] == "SteamLP" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
+    #     return "deepskyblue", 0.05
+    # elif row['SupplyStrategy'] == "HeatPumps" and (row['BarkIncrease']==0 or row['BarkIncrease']==30):
+    #     return "mediumseagreen", 1
+    # elif row['SupplyStrategy'] == "HeatPumps" and (row['BarkIncrease']==60 or row['BarkIncrease']==90):
+    #     return "mediumseagreen", 0.05 
 
     # SD results
-    # if row['celc']<74 and row['SupplyStrategy']=="SteamLP" and (row['BarkIncrease']==0):
-    #     return "deepskyblue", 1
-    # else:
-    #     return "grey", 0.1
+    if row['celc']<74 and row['SupplyStrategy']=="SteamLP" and (row['BarkIncrease']==0):
+        return "deepskyblue", 1
+    else:
+        return "grey", 0.05
 
 # Generate colors based on conditions
 colors = [get_color(row) for _, row in filtered_outcomes.iterrows()]
